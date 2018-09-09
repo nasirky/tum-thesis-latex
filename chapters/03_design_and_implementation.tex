@@ -1,0 +1,380 @@
+% !TeX root = ../main.tex
+% Add the above to each chapter to make compiling the PDF easier in some editors.
+
+\chapter{Design and Implementation}\label{chapter:design_and_implementation}
+\section{Maps}	
+	\subsection{Concept}
+	Maps play a very important role in simulating real-world depiction of any place in the ONE simulator. This allows us to simulate the physical location as accurately as possible. The \textit{MapBased Movement} provides us with the different types of map related movements.
+
+	The ONE Simulator requires the map in the modified Well-Known Text (WKT) Format. I call it the modified version as the WKT files utilizes points based system instead of coordinates based system. We use the Osm2Wkt tool\cite{mayer2010osm} for converting Open Street Maps (OSM) files to WKT for the ONE Simulator.
+
+	\subsubsection {Filtering Maps}
+	The ONE Simulator can accept one or more WKT map files. In case of more than 1 files, all of the files are basically overlayed on the top of each other. One thing to note is that the files need to be fully connected otherwise the ONE simulator won't start and will throw an error.
+
+	OpenStreetMaps provides with a tool called OSMFilter \cite{osm-filter} which enables us to filter the OSM maps. This allows us to filter specific elements such as roads, bus routes etc. To use the filtered maps with ONE simulator, we need to convert each of them to WKT.
+
+	The current implementation of the ONE simulator uses the following 4 wkt files:
+
+	\begin{center}
+    	\captionof{table}{ONE Simulator: WKT Map files used by default} \label{tab:wktMapFiles} 
+	    \begin{tabular}{ | l | p{11cm} |}
+    		\hline
+    		\textbf{Map File} & \textbf{Details} \\ \hline
+    		\textit{main\_roads.wkt} & represents the main roads (primary, secondary, tertiary). \\ \hline
+    		\textit{roads.wkt} & represents the normal roads and streets.  \\ \hline
+    		\textit{shops.wkt} & represents the shops. \\ \hline
+    		\textit{pedestrian\_paths.wkt} & represents the pedestrian paths. \\ \hline
+    	\end{tabular}
+	\end{center}
+
+	\subsubsection{OSM Maps}
+	The first step in getting the maps is to download the OSM map from the Open Street Map export tool \cite{openstreetmap-export}. Below is a depiction of the OSM Map for Central Munich.
+	\newline
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.5]{./figures/central-munich-osm}
+		\caption{Central Munich OSM Map - from OpenStreetMaps \cite{openstreetmap}}
+	\end{figure}
+
+	\subsubsection{Conversion to WKT}
+	There are a number of tools that canconvert an OSM to WKT, however, there are a few reasons we do not use any of those tools:
+	\begin{itemize}
+ 	 \item These tools do not make provide us with a fully connected maps. They just perform the conversion.
+   	 \item These tools do not convert the coordinates to the points-based system. Even though the resulting WKT file would work with the ONE simulator, however, the distances would be very small (as compared to the original). Let me give you an example, The distance between \textit{1.0001,1.2} and \textit{1.0002,1.2} in points is \textit{11m} while if we provide this directly to the ONE simulator the distance would be \textit{0.001 m (1 mm)}.
+	\end{itemize}
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.55]{./figures/wkt-file-2}
+		\caption{Snapshot of WKT File Contents - Converted using OpenJump \cite{openjump} }
+	\end{figure}
+
+	We have the OSM2WKT tool \cite{mayer2010osm} as it has solution for both of the above issues and can generate a full-connected point-based WKT file that can be used with the ONE Simulator. 
+	\newline
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.55]{./figures/wkt-file-1}
+		\caption{Snapshot of WKT File Contents - Converted using OSM2WKT tool \cite{mayer2010osm} }
+	\end{figure}
+	\newpage
+	Below is graphics depiction of the Central Munich WKT file.
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.5]{./figures/central-munich-wkt}
+		\caption{Central Munich WKT Map - Created using OSM2WKT tool \cite{mayer2010osm} and Screenshot using OpenJump \cite{openjump}}
+	\end{figure}
+
+\newpage
+\subsection{Implementation}
+\subsubsection{OSM to WKT}
+Using OSM2WKT tool \cite{mayer2010osm}, any OSM file can be converted into a fully connected WKT file for use in the ONE simulator. Below are the details of how to use the OSM2WKT tool \cite{mayer2010osm} to generate a WKT file:\newline
+
+\begin{lstlisting}[language=bash]
+java -jar ./osm2wkt.jar mapfile.osm
+
+options:
+	-o outputfile - specifiying the output file. In case no outputfile is mentioned, .wkt is appended to the name of input file.
+	-a - open the output file in append mode (adding the wkt output at the end of the output file)
+	-t deltaX deltaY - translate map by deltaX and deltaY meters
+\end{lstlisting}
+\captionof{lstlisting}{Using OSM2WKT tool \cite{mayer2010osm} to generate WKT}
+
+\vspace{8mm}
+The OSM2WKT tool \cite{mayer2010osm} performs the following operations on the OSM file:
+	\begin{enumerate}
+ 	 \item Reads the OSM Map.
+   	 \item The coordinates are converted to the points based system:
+   	 	\begin{enumerate}
+	   	 	\item The bounding box of the map is converted into point based system (width and height in meters).
+   		 	\item All the coordinates are converted to the point based system.
+   		 \end{enumerate}
+   	 \item The completeness of the graph is then checked and all the weird and unconnected edges are deleted so that we have a complete graph.
+   	 \item The file is then saved as a WKT file.
+	\end{enumerate}
+
+\newpage
+\subsubsection{Filtering OSM}
+In order to filter OSM files, OSM Filter tool \cite{osm-filter} is needed. Here is the basic syntax to use the OSM Filter tool \cite{osm-filter}.
+\vspace{2mm}
+\begin{lstlisting}[language=bash]
+	osmfilter inputfile.osm --keep="{condition}" > outputfile.osm	
+\end{lstlisting}
+\captionof{lstlisting}{How to use the OSM Filter tool \cite{osm-filter}}
+\vspace{5mm}	
+
+The listings below show how to create the four different types of OSM files which can then be converted to WKT files.
+\vspace{5mm}	
+\begin{lstlisting}[language=bash]
+	osmfilter mapfile.osm --keep="highway=*ary trunk" > main_roads.osm	
+\end{lstlisting}
+\captionof{lstlisting}{Generating main\_roads.osm file}
+\vspace{5mm}	
+\begin{lstlisting}[language=bash]
+	osmfilter mapfile.osm --keep="highway=residential service *link living_street"
+	> roads.osm	
+\end{lstlisting}
+\captionof{lstlisting}{Generating roads.osm file}
+\vspace{5mm}	
+\begin{lstlisting}[language=bash]
+	osmfilter map.osm --keep="highway=pedestrian footway living_street"
+	> pedestrian_paths.osm
+	
+\end{lstlisting}
+\captionof{lstlisting}{Generating pedestrian\_paths.osm file}
+\vspace{6mm}	
+\begin{lstlisting}[language=bash]
+	osmfilter map.osm --keep="shop=*" > shops.osm
+\end{lstlisting}
+\captionof{lstlisting}{Generating shops.wkt file}
+\vspace{5mm}	
+
+The main issue with using separate osm files is that we cannot use Osm2WKT tool \cite{mayer2010osm} and it is a difficult task to make sure the resultant map is fully connected. I have modified the Osm2WKT tool \cite{mayer2010osm} to accept more than 1 OSM files and generate the corresponding WKT files that are fully connected, however, that is beyond the scope of this document. In our simulations, we are using a single map file.
+
+\subsection{Configuration}
+In order to utlize the MapBasedMovement and the map files we have prepared (using method in the above sections), we would need to add the following to one of the configuration files:\newline
+
+\begin{lstlisting}[language=bash]
+Group.movementModel = MapBasedMovement
+
+# Configuration for 1 map file
+MapBasedMovement.nrofMapFiles = 1
+MapBasedMovement.mapFile1 = data/maps/map.wkt
+
+
+# Configuration for multiple maps files (these files need to be connected (when overlayed on each other))
+MapBasedMovement.nrofMapFiles = 4
+
+MapBasedMovement.mapFile1 = data/maps/roads.wkt
+MapBasedMovement.mapFile2 = data/maps/main_roads.wkt
+MapBasedMovement.mapFile3 = data/maps/pedestrian_paths.wkt
+MapBasedMovement.mapFile4 = data/maps/shops.wkt
+
+\end{lstlisting}
+\captionof{lstlisting}{Map-based Movement Configuration}
+\newpage
+
+\section{Access Points}
+\subsection{Concept}
+Access Points are devices that connect devices to one another and facilities the flow of information among devices. An Access Point can operate in any of the following three modes:
+
+	\begin{center}
+    	\captionof{table}{ONE Simulator: WKT Map files used by default} \label{tab:title} 
+	    \begin{tabular}{ | l | p{11cm} |}
+    		\hline
+    		\textbf{Mode} & \textbf{Description} \\ \hline
+    		\textit{Access Point (AP)} & Access Point (AP) provides a bridge for two Station Adapters (SAs) to connect and communicate with each other. Two Access Points cannot talk to each other directly. \\ \hline
+    		\textit{Station Adapter (SA)} & Station Adapter (SA) is a passive device that can connect to an Access Point and communicate to other Station Adapters using the Access Point (AP). Two Station Adapters cannot talk to each other directly. \\ \hline
+    		\textit{Adhoc} & Adhoc Mode is used when we want two devices to connect and communicate direclty to each other. Hosts in Adhoc mode cannot connect to either an Access Point (AP) or Station Adapter(SA) and vice versa. This is the default mode.\\ \hline
+    	\end{tabular}
+	\end{center}
+	\vspace{3mm}
+	\begin{figure}[h]
+		\centering 
+		\includegraphics[scale=0.45]{./figures/aps-1}
+		\caption{Hosts with Access Points (SA, AP and Adhoc) and Normal Host}
+	\end{figure}
+	\newpage
+	The above coloring combination is used in the ONE Simulator to give user the ability to visually different between the hosts with different modes (or no mode at all). Below is a screenshot from the ONE Simulator with all of the above Hosts in action.
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.5]{./figures/aps-2}
+		\caption{ONE Simulator showing all the Hosts (AP enabled and normal) in action}
+	\end{figure}
+\newpage
+\subsection{Implementation}
+Before discussing implementation details, I would like to discuss the pre-requisite for the implementation. The following table lists two classes and what they are used for:
+	\begin{center} 
+    	\captionof{table}{ONE Simulator: Classes related to Hosts/Nodes} \label{tab:title} 
+	    \begin{tabular}{ | l | p{11cm} |}
+    		\hline
+    		\textbf{Class} & \textbf{Description} \\ \hline
+    		\textit{DTNHost} & This class represents a DTN Capable host. It contains all the properties and functionalities fo the host such as groupID, MessageListeners, MovementListeners etc. \\ \hline
+    		\textit{DTNHostWithWifi} & This class is a subclass of the \textit{DTNHost} class and represents a host with Access Point/Wifi capability. It inherits everything from the parent class and adds an extra mode (which can either be ADHOC, AP or SA). \\ \hline
+    	\end{tabular}
+	\end{center}
+\vspace{3mm}
+\textit{DNTHostWithWifi} is a very lean host that takes everything from its parent \textit{DTNHost} and adds the mode. The following listing shows the implementation of \textit{DTNHostWithWifi}.
+\begin{lstlisting}[language=java]
+public class DTNHostWithWifi extends DTNHost {
+	public static int AP = 1;
+	public static int SA = 2;
+	public static int ADHOC = 3;
+	
+	private int mode;
+
+	public DTNHostWithWifi(List<MessageListener> msgLs, List<MovementListener> movLs, String groupId,List<NetworkInterface> interf, ModuleCommunicationBus comBus, MovementModel mmProto, MessageRouter mRouterProto, String mode) {	
+		super(msgLs, movLs, groupId, interf, comBus, mmProto, mRouterProto);	
+		this.mode = mode.equalsIgnoreCase("ap") ? AP : mode.equalsIgnoreCase("sa") ? SA : ADHOC;
+	}
+	
+	public int getMode() {
+		return mode;
+	}
+	
+	public String getModeName() {		
+		return mode == ADHOC ? "ADHOC" : (mode == AP ? "AP" : "AP");
+	}
+}
+\end{lstlisting}
+\captionof{lstlisting}{ONE Simulator: DTNHostWithWifi Implementation}
+
+There is still another component that needs to be implemented i.e. an interface to the new \textit{DTNHostWithWifi}. We call it \textit{WifiInterface}. The following table discusses the two main classes.
+
+
+\begin{center}
+    	\captionof{table}{ONE Simulator: WKT Map files used by default} \label{tab:title} 
+	    \begin{tabular}{ | l | p{11cm} |}
+    		\hline
+    		\textbf{Class} & \textbf{Description} \\ \hline
+    		\textit{SimpleBroadcastInterface} & \textit{SimpleBroadcastInterface} is a Network Interface that is responsible for connectivity among hosts. It allows one-to-one transmissions with a constant bit-rate.\\ \hline
+    		\textit{WifiInterface} & \textit{WifiInterface} is responsible for connectivity between two different \textit{DTNHostWithWifi} objects. It is also responsible that the connection rules (SA can connect only to AP, Adhoc hosts can connect to each other only) are upheld. \\ \hline
+    	\end{tabular}
+	\end{center}
+\vspace{3mm}
+\textit{WifiInterface} takes almost everything from its parent but adds the extra ability to check if two \textit{DTNHostWithWifi} can connect to each other. Another method that it overrides is the ability to return \textit{DTNHostWithWifi} with the \textit{getHost()} method.
+\vspace{3mm}
+
+\begin{lstlisting}[language=java]
+public class WifiInterface extends SimpleBroadcastInterface {
+	...	 
+	public void connect(NetworkInterface anotherInterface) {
+		if (canConnectTo(anotherInterface)) {
+			...
+		}
+	}
+
+	/*
+	 * Along with the usual connectivity rules, we also check if the 
+	 * DTNHosts can connect to each other by having compatible modes.
+	 */
+	boolean canConnectTo(NetworkInterface anotherInterface) {
+		boolean canConnect = isScanning()  
+		&& anotherInterface.getHost().isRadioActive() 
+		&& isWithinRange(anotherInterface) 
+		&& !isConnected(anotherInterface)
+		&& (this != anotherInterface);
+		
+		if(canConnect) {
+			WifiInterface thisInterface = (WifiInterface) this;
+			WifiInterface secondInterface = (WifiInterface) anotherInterface;
+			
+			int thisInterfaceMode = thisInterface.getHost().getMode();
+			int secondInterfaceMode = secondInterface.getHost().getMode();
+
+			if(thisInterfaceMode == DTNHostWithWifi.ADHOC) {
+				canConnect = thisInterfaceMode == secondInterfaceMode;				
+			} else {
+				canConnect = (thisInterfaceMode == DTNHostWithWifi.AP && secondInterfaceMode == DTNHostWithWifi.SA) 
+				|| (thisInterfaceMode == DTNHostWithWifi.SA && secondInterfaceMode == DTNHostWithWifi.AP);
+			}
+		}
+		
+		return canConnect;
+	}	
+	
+	public DTNHostWithWifi getHost() {
+		return (DTNHostWithWifi)host;
+	}
+}
+\end{lstlisting}
+\captionof{lstlisting}{ONE Simulator: WifiInterface Implementation}
+\newpage
+
+Now, we need to combine both of these to make sure that any host having a \textit{WifiInterface} is instantiated as \textit{DTNHostWithWifi} objects and all othe other hosts are instantiated as \textit{DTNHost} objects. This needs to be done inside \textit{createHosts()} function of \textit{SimScenario} class. Below are the changes that are made to achieve this purpose:
+vspace{3mm}
+\begin{lstlisting}[language=java]
+			boolean hasWifiInterface = false;
+			
+			// setup interfaces
+			for (int j=1;j<=nrofInterfaces;j++) {
+				...
+				if(iface instanceof WifiInterface) {
+					hasWifiInterface = true;
+				}
+				...
+			}
+			...
+			//Get Wifi modes for hosts (only exist for DTNHostWithWifi)
+			List<String> modes = new ArrayList<String>();
+			String wifiMode = s.getSetting("mode",null);
+
+			if(wifiMode == null) {
+				String modesFile = s.getSetting("modesFile",null);
+				if(modesFile != null) {
+					try {
+						Scanner in = new Scanner(new FileReader(modesFile));
+						while(in.hasNextLine()) {
+							modes.add(in.nextLine());
+						}
+						in.close();
+					} catch (FileNotFoundException e) {}
+				}
+			}
+			
+			// creates hosts of ith group
+			for (int j=0; j<nrofHosts; j++) {
+				...
+				if(!hasWifiInterface) {
+					DTNHost host = new DTNHost(this.messageListeners, 
+						this.movementListeners,	gid, interfaces, comBus, 
+						mmProto, mRouterProto);
+					hosts.add(host);
+				} else {
+					String mode = wifiMode != null ? wifiMode : (j < modes.size() ? modes.get(j) : "");
+				
+					DTNHostWithWifi host = new DTNHostWithWifi(this.messageListeners, this.movementListeners, gid, interfaces, comBus, mmProto, mRouterProto,  mode: mode);
+					hosts.add(host);
+				}
+			}
+		}
+	}
+\end{lstlisting}
+\captionof{lstlisting}{ONE Simulator: Changes to SimScenario for Implementation of the AP-capable hosts}
+\subsection{Configuration}
+Here we will show how to configure \textit{DTNHost} and \textit{DTNHostWithWifi}. We will also show how to configure \textit{mode} for \textit{DTNHostWithWifi}.
+
+\begin{lstlisting}[language=bash]
+# We need to create two different types of interfaces (based on the types of interface, either DTNHost or DTNHostWithWifi object is created)
+
+# Declaring WifiInterface (any host/group of hosts having this interface will be the DTNHostWithWifi hosts)
+wifiInterface.type = WifiInterface
+wifiInterface.transmitSpeed = 50k
+wifiInterface.transmitRange = 40
+
+# Declaring SimpleBroadcastInterface (any host/group of hosts having this interface will be the DTNHost hosts)
+btInterface.type = SimpleBroadcastInterface
+btInterface.transmitSpeed = 250k
+btInterface.transmitRange = 10
+
+# Making sure all the groups are counted and created
+Scenario.nrofHostGroups = 5
+
+
+# Defining general behavior for Groups
+Group.nrofInterfaces = 1
+Group.interface1 = btInterface
+
+# Defining normal DTNHosts (We do not need to attach btInterface as all the groups would have the btInterface by default)
+Group1.groupID = Normal
+
+# Defining Station Adapters (groupID can be anything as only the mode can identify between different types of hosts)
+Group2.groupID = SA           
+Group2.interface1 = wifiInterface
+Group2.mode = sa
+
+# Defining Access Points
+Group3.groupID = AP
+Group3.interface1 = wifiInterface
+Group3.mode = ap
+
+# Defining Adhoc nodes (We can eliminate mode here as well as adhoc is the default mode)
+Group4.groupID = ADHOC
+Group4.interface1 = wifiInterface
+Group4.mode = adhoc
+
+# Declearing Wifi nodes with different modes (modes are contained in the modesFile)
+Group5.groupID = D
+Group5.interface1 = wifiInterface
+Group5.modesFile = data/modes.txt   #modes.txt is containing one mode per line. The mode is applied to the hosts in the same order
+
+\end{lstlisting}
