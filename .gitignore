@@ -1,3 +1,11 @@
 /build/*
 !/build/main.pdf
 /logos/*.pdf
+main.aux
+main.bcf
+main.dvi
+main.fdb_latexmk
+main.fls
+main.log
+main.out
+missfont.log

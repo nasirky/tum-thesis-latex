@@ -158,7 +158,7 @@ MapBasedMovement.mapFile4 = data/maps/shops.wkt
 Access Points are devices that connect devices to one another and facilities the flow of information among devices. An Access Point can operate in any of the following three modes:
 
 	\begin{center}
-    	\captionof{table}{ONE Simulator: WKT Map files used by default} \label{tab:title} 
+    	\captionof{table}{ONE Simulator: Modes of Operation for Access Points/Wifi Interface} 
 	    \begin{tabular}{ | l | p{11cm} |}
     		\hline
     		\textbf{Mode} & \textbf{Description} \\ \hline
@@ -184,7 +184,7 @@ Access Points are devices that connect devices to one another and facilities the
 \subsection{Implementation}
 Before discussing implementation details, I would like to discuss the pre-requisite for the implementation. The following table lists two classes and what they are used for:
 	\begin{center} 
-    	\captionof{table}{ONE Simulator: Classes related to Hosts/Nodes} \label{tab:title} 
+    	\captionof{table}{ONE Simulator: Classes related to Hosts/Nodes} 
 	    \begin{tabular}{ | l | p{11cm} |}
     		\hline
     		\textbf{Class} & \textbf{Description} \\ \hline
@@ -217,12 +217,11 @@ public class DTNHostWithWifi extends DTNHost {
 }
 \end{lstlisting}
 \captionof{lstlisting}{ONE Simulator: DTNHostWithWifi Implementation}
-
+\vspace{5mm}
 There is still another component that needs to be implemented i.e. an interface to the new \textit{DTNHostWithWifi}. We call it \textit{WifiInterface}. The following table discusses the two main classes.
 
-
 \begin{center}
-    	\captionof{table}{ONE Simulator: WKT Map files used by default} \label{tab:title} 
+    	\captionof{table}{ONE Simulator: WifiInterface \& its parent interface} 
 	    \begin{tabular}{ | l | p{11cm} |}
     		\hline
     		\textbf{Class} & \textbf{Description} \\ \hline
@@ -378,3 +377,166 @@ Group5.interface1 = wifiInterface
 Group5.modesFile = data/modes.txt   #modes.txt is containing one mode per line. The mode is applied to the hosts in the same order
 
 \end{lstlisting}
+\newpage
+\section{Snapping to Access Points}
+\subsection{Concept}
+In the \hyperref[section:floating-content]{\emph{Floating Content Section}}, it was discussed that a message is tagged with geographical coordinates and an availability/radius. \textit{Snapping to Access Point} is the concept of increasing the availability of the message beyond its original availability zone. In the configuration, we can define how many Access Points should the message snap to at maximum. Theoretically, the number of snapped Access Points should directly influence the TTL (Time to live) of the message. Below is a step-wise explanation of the process:
+
+	\begin{enumerate}
+ 	 \item The host Station Adapter (\textit{SA1}) generates a message \textit{M} with a center \textit{C} (which is the location of \textit{SA1} at that time), availability \textit{a} and number of maximum access points to snap to (\textit{k}). Assuming \textit{k = 3}.
+ 	 \item \textit{SA1} comes in contact with an Access Point (\textit{AP1}), connection is made and a copy of the message \textit{M} is transferred (\textit{M'}).
+ 	 \item If \textit{k}-value for the original message \textit{M} is greater than 0:
+ 	 	\begin{enumerate}
+ 	 		\item \textit{k}-value for the original message (\textit{M}) is decreased by 1.
+ 	 		\item \textit{k}-value for the copied message (\textit{M'}) is set to zero.
+ 	 		\item The center of the copied message (\textit{M'}) is changed to the center of the Access Point (\textit{AP1}).
+ 	 	\end{enumerate}
+ 	 \item The above process continues for the original message \textit{M} until \textit{k}=0. 	 		
+ 	 \end{enumerate}
+ 	 
+ 	Since the ID of the message \textit{M} and all of the copies is the same, they are treated as the same message; which allows us to extend the availability of the message.  \newline
+ 	There are a few important points to note:
+	\begin{enumerate}
+ 	 \item Copies of the message are not snapped to any access point, Only the original message is snapped.
+ 	 \item If a message is snapped to 1 access point which drops it due to any reason (apart from TTL expiry), whenever that message (the original or even the copy which knows about this access point) is copied again, it is snapped to that access point again.
+ 	 \item The availability zones of the copies might or might not intersect each other, however, the availability zone of the original message and each copy would have an overlap.
+ 	 \end{enumerate}
+	\begin{figure}[h]
+		\centering 
+		\includegraphics[scale=0.45]{./figures/snapped-to-ap-1}
+		\caption{Availability zones of Message with k=0 (not snapped yet) to the left and k=1 (snapped to 1 Access Point) to the right}
+	\end{figure}
+	\vspace{8mm}
+	\begin{figure}[h]
+		\centering 
+		\includegraphics[scale=0.45]{./figures/snapped-to-ap-2}
+		\caption{Availability zones of Message with k=2 (snapped to 2 Access Points)}
+	\end{figure}
+	\vspace{5mm}
+	\begin{figure}[h!]
+		\centering 
+		\includegraphics[scale=0.45]{./figures/snapped-to-ap-3}
+		\caption{Availability zones of Message with k=3 (snapped to 3 Access Points)}
+	\end{figure}
+	\begin{figure}[h!]
+		\centering 
+		\includegraphics[scale=0.45]{./figures/snapped-to-ap-4}
+		\caption{Special Case: Message with k=3 where there is no overlap between availability zones of the copies}
+	\end{figure}
+
+\newpage
+\subsection{Implementation}
+\subsubsection{Snapping to Access Point}
+\begin{enumerate}
+	\item The very first point is to attach an \textit{originalAnchor} to the message (which is the point where the message was originally generated).		
+	\begin{lstlisting}[language=java]
+	m.addProperty("originalAnchor", m.getProperty("anchor"));
+	\end{lstlisting}
+	\item The settings for the number of Access Points to snap to (\textit{kNextAPs}) is fetched inside \textit{FloatingContentRouter}.
+	\begin{lstlisting}[language=java]
+		if (fcSettings.contains(FC_NUM_OF_APS))
+			kNextAPs = fcSettings.getInt(FC_NUM_OF_APS);
+	\end{lstlisting}
+	\item When message transfer is complete (\textit{messageTransferred} method in \textit{FloatingContentRouter}), we need to check f the message need to be snapped to any Access Point (by checking \textit{kNextAPs} property of the message).:
+	\begin{enumerate}
+		\item If the host does not have a wifi interface, the control is returned back to the caller.
+		\begin{lstlisting}[language=java]
+			if(!(this.getHost() instanceof DTNHostWithWifi)
+				return m;
+			\end{lstlisting}
+		\item If the receiving node is not an access point, the control is returned back to the caller.
+		\begin{lstlisting}[language=java]
+			DTNHostWithWifi receivingNode = (DTNHostWithWifi) this.getHost();
+			if(receivingNode.getMode() != DTNHostWithWifi.AP)
+				return m;
+		\end{lstlisting}
+
+		\item \textit{kNextAP} for the copied message is set to 0.
+		\begin{lstlisting}[language=java]
+			m.updateProperty(FC_NUM_OF_APS, 0);
+		\end{lstlisting}
+
+		\item The \textit{anchor} of the copy is set to location of the access point if the message had been already anchored to this access point and the message still can be anchored to access points (\textit{kNextAPs>0}). Decrease \textit{kNextAPs} only if the message was not previously anchored to this access point.
+		\begin{lstlisting}[language=java]
+		if ((int) msg.getProperty(FC_NUM_OF_APS) > 0 || (anchorAccessPoints != null && anchorAccessPoints.contains(receivingNode.toString()))) {
+			m.updateProperty(FC_ANCHOR, receivingNode.getLocation().clone());
+
+			if((int) msg.getProperty(FC_NUM_OF_APS) > 0)
+				msg.updateProperty(FC_NUM_OF_APS, (int) msg.getProperty(FC_NUM_OF_APS) - 1);
+		}
+		\end{lstlisting}
+		\item The access point ID is added to the list of APS (\textit{anchorAPs}) property of the message. This helps us in re-snapping the message to the access point if the access points get a new copy of the same message.
+		\begin{lstlisting}[language=java]
+		anchorAccessPoints.add(receivingNode.toString());				
+		msg.updateProperty(FC_ANCHOR_APS, anchorAccessPoints);
+		m.updateProperty(FC_ANCHOR_APS, anchorAccessPoints);
+		\end{lstlisting}
+		\item The access point location is added to the list of APS (\textit{anchorAPsLocation}) property of the message. This is used to make sure that the new availability zones are also accounted for before trying to delete a message.
+		\begin{lstlisting}[language=java]
+		anchorAccessPointsLocations.add(receivingNode.getLocation().clone());
+		msg.updateProperty(FC_ANCHOR_APS_LOC, anchorAccessPointsLocations);
+		m.updateProperty(FC_ANCHOR_APS_LOC, anchorAccessPointsLocations);
+		\end{lstlisting}
+		\end{enumerate}
+\end{enumerate}
+\subsubsection{Changes to Message Deletion Algorithm}
+Here we are making sure that the message is deleted only after the it is outside of the new availability zones (in case a message is snapped to access point, we need to check that the message is outside all the availability zones for that message).
+
+\begin{lstlisting}[language=java]
+for (Message m : m_set) {
+	ArrayList<Coord> locations;
+	try {
+		locations = new ArrayList<Coord>((HashSet<Coord>)m.getProperty(FloatingContentRouter.FC_ANCHOR_APS_LOC));
+	} catch(NullPointerException ignored) {
+		locations = new ArrayList<>();						
+	}
+
+	locations.add(0, (Coord)m.getProperty(FC_ANCHOR));
+	locations.add(1,(Coord)m.getProperty(FC_ANCHOR_ORIGINAL));
+		
+	int counter = 0;
+	while(counter<locations.size()) {
+		distance_curr = loc.distance(locations.get(counter));
+		
+		if ((deletion_check(distance_curr, (Double) m.getProperty(FC_R), (Double) m.getProperty(FC_A)) != 1))
+				break;
+		counter ++;
+	}
+					
+	if(counter == locations.size() && !d_list.contains(m.getId()))
+		d_list.add(m.getId());
+}
+\end{lstlisting}
+\subsection{Configuration}
+\begin{lstlisting}[language=bash]
+FloatingContentRouter.kNextAPs = 1
+\end{lstlisting}
+\newpage
+\section{Access Points Data}
+\subsection{Concept}
+\subsubsection{Data Collection}
+We are using the wifi access points database from RadioCells \cite{wifi-data}. The database has a number of tables, however, we are only concerned with \textit{wifi\_zone}. We are only using \textit{latitude} and \textit{longitude} data.
+\subsubsection{Data Processing}
+We follow the following steps to process the data for the ONE Simulator:
+\begin{enumerate}
+	\item The data from sqlite database is exported to a text file. 
+	\item The data is processed by removing the double quotes and separating latitude and longitude by a comma (,).
+	\item To make sure that the coordinates are converted to the correct scaling, we add the boundary coordinates to the file. Below are the boundary coordinates:
+	\begin{itemize}
+		\item minimumLatitude,0
+		\item maximumLatitude,0
+		\item 0,minimumLongitude
+		\item 0,maximumLongitude
+	\end{itemize}
+	\item The processed file is then passed to a Coordinate Converter which returns a WKT file with the transformed coordinates.
+	\item The WKT file can then be used for setting up the access points on the map using \textit{StationaryMapBasedMovement}.
+\end{enumerate}
+\begin{figure}[h]
+	\centering
+	\includegraphics{./figures/access-points-data}
+	\caption{Transformed Access Points Data}
+\end{figure}
+\subsection{Implementation}
+% TODO:
+	% StationaryMapBasedMovement
+	% CoordinatesConverter
