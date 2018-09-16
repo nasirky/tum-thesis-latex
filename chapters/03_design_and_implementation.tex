@@ -537,6 +537,97 @@ We follow the following steps to process the data for the ONE Simulator:
 	\caption{Transformed Access Points Data}
 \end{figure}
 \subsection{Implementation}
-% TODO:
-	% StationaryMapBasedMovement
-	% CoordinatesConverter
+A majority of the implementation is taken from Osm2Wkt \cite{mayer2010osm}. The implementation is pretty straight-forward and can be explained in the following steps:
+\begin{enumerate}
+\item We open the file and read the content into an array of Landmarks (\textit{Landmark} has \textit{latitude}, \textit{longitude} for the original coordinates as well as \textit{x}, \textit{y} for storing the transformed coordinates)
+\begin{lstlisting}[language=java]
+Scanner in = new Scanner(new FileReader(filePath));
+
+while(in.hasNextLine()) {
+	String text = in.nextLine().trim();
+	if(text.length() > 0) {
+		String[] coordinates = text.split(",");
+		Landmark landmark = new Landmark(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+		landmarks.add(landmark);
+	}
+}
+in.close();
+\end{lstlisting}
+\item The coordinates are then transformed using \textit{transformCoordinates} \cite{mayer2010osm}.
+\item Finally the coordinates are written in a WKT file which can be used by the ONE Simulator.
+\end{enumerate}
+
+To Read the WKT file in ONE simulator, we have implemented \textit{StationaryMapBasedMovement} and \textit{MapNodeExtended} classes. The following table explains the functionality of each of these classes.
+
+	\begin{center}
+    	\captionof{table}{ONE Simulator: Classes for WKT based Node positioning} \label{tab:wktMapFiles} 
+	    \begin{tabular}{ | l | p{11cm} |}
+    		\hline
+    		\textbf{Class} & \textbf{Details} \\ \hline
+    		\textit{MapNodeExtended} & Inherits from the \textit{MapNode} class. It reads the WKT file and apply transformations (mirror and translation) to the location points. \\ \hline
+    		\textit{StationaryMapBasedMovement} & Inherits from \textit{MapBasedMovement} class. Get list of transformed locations (from the WKT file) by passing it to \textit{MapNodeExtended}. \\ \hline
+    	\end{tabular}
+	\end{center}
+\newpage
+Below are two main functions from \textit{StationaryMapBasedMovement}.
+\vspace{3mm}
+\begin{lstlisting}[language=java]
+	public StationaryMapBasedMovement(Settings settings) {
+		super(settings);
+
+		String fileName = settings.getSetting(ROUTE_FILE_S);
+		allNodes = MapNodeExtended.readNodes(fileName, getMap());		
+	}
+		
+	@Override
+	public Coord getInitialLocation() {
+		counter = (counter + 1) \% allNodes.size();
+		return allNodes.get(counter).getLocation();
+	}
+\end{lstlisting}
+\captionof{lstlisting}{Main features of \textit{StationaryMapBasedMovement} class}
+
+\vspace{10mm}
+Below is the main code snippet from \textit{MapNodeExtended} class.
+\vspace{3mm}
+\begin{lstlisting}[language=java]
+		WKTReader reader = new WKTReader();
+		List<Coord> coords;
+		File routeFile = null;
+		
+		double xOffset = map.getOffset().getX();
+		double yOffset = map.getOffset().getY();
+
+		List<MapNode> nodes = new ArrayList<MapNode>();
+
+		try {
+			routeFile = new File(fileName);
+			coords = reader.readPoints(routeFile);
+		}
+		catch (IOException ioe) {
+			throw new SettingsError("Couldn't read MapRoute-data file " + 
+					fileName + 	" (cause: " + ioe.getMessage() + ")");
+		}
+
+
+		for (Coord c : coords) {			
+			if(map.isMirrored())
+				c.mirror();
+			
+			c.translate(xOffset, yOffset);
+			
+			MapNode node = map.getNodeByCoord(c);
+			if (node == null) {
+				node = new MapNode(c);
+			}
+			nodes.add(new MapNodeExtended(node));			
+		}
+		
+		return nodes;
+\end{lstlisting}
+\captionof{lstlisting}{Getting List of all MapNodes (taken from \textit{MapNodeExtended})}
+\vspace{8mm}
+\subsection{Configuration}
+\begin{lstlisting}[language=bash]
+Group1.routeFile = data/path_to_wkt_file/file_name.wkt
+\end{lstlisting}
