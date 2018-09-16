@@ -17,7 +17,7 @@
 
 	\begin{center}
     	\captionof{table}{ONE Simulator: WKT Map files used by default} \label{tab:wktMapFiles} 
-	    \begin{tabular}{ | l | p{11cm} |}
+	    \begin{tabular}{ | l | p{10.5cm} |}
     		\hline
     		\textbf{Map File} & \textbf{Details} \\ \hline
     		\textit{main\_roads.wkt} & represents the main roads (primary, secondary, tertiary). \\ \hline
@@ -159,7 +159,7 @@ Access Points are devices that connect devices to one another and facilities the
 
 	\begin{center}
     	\captionof{table}{ONE Simulator: Modes of Operation for Access Points/Wifi Interface} 
-	    \begin{tabular}{ | l | p{11cm} |}
+	    \begin{tabular}{ | l | p{10.5cm} |}
     		\hline
     		\textbf{Mode} & \textbf{Description} \\ \hline
     		\textit{Access Point (AP)} & Access Point (AP) provides a bridge for two Station Adapters (SAs) to connect and communicate with each other. Two Access Points cannot talk to each other directly. \\ \hline
@@ -184,13 +184,13 @@ Access Points are devices that connect devices to one another and facilities the
 \subsection{Implementation}
 Before discussing implementation details, I would like to discuss the pre-requisite for the implementation. The following table lists two classes and what they are used for:
 	\begin{center} 
-    	\captionof{table}{ONE Simulator: Classes related to Hosts/Nodes} 
-	    \begin{tabular}{ | l | p{11cm} |}
+	    \begin{tabular}{ | l | p{10.5cm} |}
     		\hline
     		\textbf{Class} & \textbf{Description} \\ \hline
     		\textit{DTNHost} & This class represents a DTN Capable host. It contains all the properties and functionalities fo the host such as groupID, MessageListeners, MovementListeners etc. \\ \hline
     		\textit{DTNHostWithWifi} & This class is a subclass of the \textit{DTNHost} class and represents a host with Access Point/Wifi capability. It inherits everything from the parent class and adds an extra mode (which can either be ADHOC, AP or SA). \\ \hline
     	\end{tabular}
+       	\captionof{table}{ONE Simulator: Classes related to Hosts/Nodes} 
 	\end{center}
 \vspace{3mm}
 \textit{DNTHostWithWifi} is a very lean host that takes everything from its parent \textit{DTNHost} and adds the mode. The following listing shows the implementation of \textit{DTNHostWithWifi}.
@@ -199,18 +199,15 @@ public class DTNHostWithWifi extends DTNHost {
 	public static int AP = 1;
 	public static int SA = 2;
 	public static int ADHOC = 3;
-	
 	private int mode;
 
 	public DTNHostWithWifi(List<MessageListener> msgLs, List<MovementListener> movLs, String groupId,List<NetworkInterface> interf, ModuleCommunicationBus comBus, MovementModel mmProto, MessageRouter mRouterProto, String mode) {	
 		super(msgLs, movLs, groupId, interf, comBus, mmProto, mRouterProto);	
 		this.mode = mode.equalsIgnoreCase("ap") ? AP : mode.equalsIgnoreCase("sa") ? SA : ADHOC;
 	}
-	
 	public int getMode() {
 		return mode;
 	}
-	
 	public String getModeName() {		
 		return mode == ADHOC ? "ADHOC" : (mode == AP ? "AP" : "AP");
 	}
@@ -222,7 +219,7 @@ There is still another component that needs to be implemented i.e. an interface 
 
 \begin{center}
     	\captionof{table}{ONE Simulator: WifiInterface \& its parent interface} 
-	    \begin{tabular}{ | l | p{11cm} |}
+	    \begin{tabular}{ | l | p{10cm} |}
     		\hline
     		\textbf{Class} & \textbf{Description} \\ \hline
     		\textit{SimpleBroadcastInterface} & \textit{SimpleBroadcastInterface} is a Network Interface that is responsible for connectivity among hosts. It allows one-to-one transmissions with a constant bit-rate.\\ \hline
@@ -560,13 +557,14 @@ in.close();
 To Read the WKT file in ONE simulator, we have implemented \textit{StationaryMapBasedMovement} and \textit{MapNodeExtended} classes. The following table explains the functionality of each of these classes.
 
 	\begin{center}
-    	\captionof{table}{ONE Simulator: Classes for WKT based Node positioning} \label{tab:wktMapFiles} 
-	    \begin{tabular}{ | l | p{11cm} |}
+	    \begin{tabular}{ | l | p{8.8cm} |}
     		\hline
     		\textbf{Class} & \textbf{Details} \\ \hline
     		\textit{MapNodeExtended} & Inherits from the \textit{MapNode} class. It reads the WKT file and apply transformations (mirror and translation) to the location points. \\ \hline
     		\textit{StationaryMapBasedMovement} & Inherits from \textit{MapBasedMovement} class. Get list of transformed locations (from the WKT file) by passing it to \textit{MapNodeExtended}. \\ \hline
     	\end{tabular}
+    	\captionof{table}{ONE Simulator: Classes for WKT based Node positioning} \label{tab:wktMapFiles} 
+
 	\end{center}
 \newpage
 Below are two main functions from \textit{StationaryMapBasedMovement}.
