@@ -4,10 +4,24 @@
 \chapter{Introduction}\label{chapter:introduction}
 
 \section{Motivation}
+The Opportunistic Network Environment (also known as ONE) simulator is a tool for evaluating Delay Tolerant Networks (DTNs). The ONE simulator provides us with a number of different movement models and routing algorithms to simulate various conditions. One of the interesting features is the ability to provide Map-based movement which enables us to model any area of the map. The ONE simulator comes with the map of Helsinki by default. One main feature it lacks is access point based connectivity, which is quite a common feature of connected networks. Implementation of access points in the ONE simulator is necessary for the following two main reasons:
+
+\begin{itemize}
+  \item Access points based networks are very common, while ad-hoc networks are not so common.
+  \item Evaluation of how access points would affect content sharing using DTNs.
+\end{itemize}
+
+One of the main issues of Delay Tolerant Networks(DTNs) is security. Floating content provides a solution for this issue by limiting the availability zone of the messages. However, this security is at the expense of message availability. One way to increase the availability zone is by snapping the message to nearest access points. Snapping to access point is a concept where the access point takes ownership of its copy of the message (thus changing the availability zone). However, all the snapped availability zones would be at least overlapping with the original availability zone. It would be interesting to study the following two scenarios:
+\begin{itemize}
+  \item availability of messages vs. number of access points the message is snapped to
+  \item availability of messages vs. new availability (due to snapping to access points)
+\end{itemize}
+
+In short, the main motivation is to study the effect of access points support and snapping to access points on the message life/availability to ascertain these features affect the behavior of Delay Tolerant Networks (DTNs).
 \newpage
 \section{Research Questions/Goals}
 Several questions/goals were explored in this work to weigh different extensions to the ONE Simulator such as adding access point functionality as well as snapping to access points etc. We have formulated these goals/research questions below :\newline
 \newline\textbf{Q1: Modeling a city and exploring the impact of access points on the performance of geo-based information sharing.}\newline
-The ONE Simulator currenly models Helsinki City and doesn't have any access points feature. The main idea here is to Model Munich City (especially the central part), Implement Access Points and then explore the impact of the access points on the geo-based information sharing performance using ONE Simulator. It also involves mapping publicly available Access Points on the Munich Model City Map.\newline
-\newline\textbf{Q2: How does snapping to access point affect the availabilty of a floating message in a Delay Tolerant Network (DTN)?}\newline
-\textit{Snapping to Access Point} is the concept of increasing the availability of the message beyond its original availability zone. The idea is to change the center of the message when it is encounters an access point. However, we do limit the number of access points a message can snap to. After implementation of snapping to access point, we will test how does the snapping to different number of access points affect the availability of the floating message in a DTN.
+The ONE Simulator currently models Helsinki City and doesn't have any access points feature. The main idea here is to Model Munich City (especially the central part), Implement Access Points and then explore the impact of the access points on the geo-based information sharing performance using ONE Simulator. It also involves mapping publicly available Access Points on the Munich Model City Map.\newline
+\newline\textbf{Q2: How does snapping to access point affect the availability of a floating message in a Delay Tolerant Network (DTN)?}\newline
+\textit{Snapping to Access Point} is the concept of increasing the availability of the message beyond its original availability zone. The idea is to change the center of the message when it encounters an access point. However, we do limit the number of access points a message can snap to. After implementation of snapping to access point, we will test how does the snapping to a different number of access points affect the availability of the floating message in a DTN.
