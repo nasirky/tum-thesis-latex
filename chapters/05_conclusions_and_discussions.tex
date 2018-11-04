@@ -1,7 +1,23 @@
 % !TeX root = ../main.tex
 % Add the above to each chapter to make compiling the PDF easier in some editors.
 
-\chapter{Conclusions and Discussions}\label{chapter:conclusions_and_discussions}
-% TODO: Run a couple of simulations before going below
-% FloatingMessageSummaryReport
-% FloatingMessageExtendedReport
+\chapter{Conclusions}\label{chapter:conclusions}
+This chapter deals with the discussion of the results with respect to the research questions. We will list the research questions below and then answer them with respect to the outcome of the simulations (we have performed).\newline
+
+\textbf{Q1: Modeling a city and exploring the impact of access points on the performance of geo-based information sharing.} \newline
+
+Access points have an overall positive effect on the network. Below is a break-down with respect to three main parameters (message size, availability zone and, the number of hosts):
+
+\begin{enumerate}
+  \item Information sharing works better with the increasing size of the message (or decreasing capacity of the nodes). In other words, as the message size increases, the average message life also increases.
+  \item Increasing the availability zone has a positive effect on information availability. In other words, as the availability zone size increases, so does the average message life.
+  \item Increasing the number of hosts also have a positive effect on information availability.
+\end{enumerate}
+\vspace{4mm}
+\textbf{Q2: How does snapping to access point affect the availability of a floating message in a Delay Tolerant Network (DTN)?}\newline
+\textit{Snapping to Access Points} always has a positive impact on the average message life which means increased network performance. The number of access points a message can be snapped to is denoted by \textbf{k}. We have also noted the following:
+\begin{enumerate}
+  \item Increasing \textit{k} has no effect when the message size is small (less than or equal to 50k), however, as the message size increases, increasing \textbf{k} has a positive effect. The average message life is always better for higher values of \textbf{k} when compared to lower values.
+  \item Increasing \textbf{k} always has a positive effect regardless of the availability zone size. The average message life is always better for higher values of \textbf{k} than lower values.
+  \item Increasing \textbf{k} always has a positive effect regardless of the number of hosts. The average message life is always better for higher values of \textbf{k} when compared to lower values.
+\end{enumerate}
