@@ -68,9 +68,8 @@ As users with mobile devices pass through locations, they automatically receive 
 Floating content is an ephemeral content sharing service, solely dependent on mobile devices in the vicinity using principles of opportunistic networking. The net result is a best effort service for floating content in which: 1) information dissemination is geographically limited; 2) the lifetime and spreading of information depend on interested nodes being available; 3) traffic can only be created and caused locally; and 4) content can only be added, but not deleted. Floating Content is discussed in more details \hyperref[section:floating-content]{\emph{later in the chapter}}.
 
 \subsection{Delay Tolerant Networking (DTN)}
-Delay-tolerant Networking (DTN) enables communication in sparse mobile ad-hoc networks and other challenged environments where traditional networking fails and new routing and application protocols are required. Past experience with DTN routing and application protocols has shown that their performance is highly dependent on the underlying mobility and node characteristics \cite{keranen-theone}. The basic idea behind DTN is to communicate data/messages from the source to the destination without having complete network connectivity. The path from the source to the destination is unknown due to the unconnected nature of the network. In such networks, each node store the messages it receives and forwards it to the next node it comes in contact with. The message may or may not reach its final destination.
-
-Below are a few characteristics of DTNS:
+Delay-tolerant Networking (DTN) enables communication in sparse mobile ad-hoc networks and other challenged environments where traditional networking fails and new routing and application protocols are required. Past experience with DTN routing and application protocols has shown that their performance is highly dependent on the underlying mobility and node characteristics \cite{keranen-theone}. The basic idea behind DTN is to communicate data/messages from the source to the destination without having complete network connectivity. The path from the source to the destination is unknown due to the unconnected nature of the network. In such networks, each node store the messages it receives and forwards it to the next node it comes in contact with. The message may or may not reach its final destination.\newline
+DTNs are also known \textit{Opportunistic Networks} due to the fact that the nodes connect to each other and transfer message as soon as they get the opportunity (when they come in vicinity of each). Below are a few characteristics of DTNs:
 \begin{enumerate}
   \item \textbf{Mobility}: DTN is based on the concept of mobile nodes which enables the flow of information. Unlike traditional networks, node mobility to required to transfer data.
   \item \textbf{Dynamic}: Since the nodes are mobile, old nodes leave and new nodes connect to the network, making it a very dynamic network.
@@ -188,56 +187,51 @@ In the above listing, the first run will use the value 0, next one will use the 
 \label{section:floating-content}
 Floating content is an ephemeral content sharing service, solely dependent on the mobile devices in the vicinity using principles of opportunistic networking. The net result is a best effort service for floating content in which: 1) information dissemination is geographically limited; 2) the lifetime and spreading of information depend on interested nodes being available; 3) traffic can only be created and caused locally; and 4) content can only be added, but not deleted \cite{floating-content}.
 
-In Floating Content, a message (a text message, an image, etc.) deemed to be of interest to other people at a certain area is tagged with geographical coordinates of that area. This area is referred to as the anchor-zone of the message \cite{floating-content-1}. Each message has two main properties namely \textit{Center} and \textit{Availability/anchor zone}. For the sake of simplicity, the anchor zone is defined as a circle with a radius. In short, floating messages can be relayed to other nodes inside the anchor zone. Every time a copy of the message is made, the anchor zone properties are copied to make sure that the copied message has the same anchor zone as the original message.
+In Floating Content, a message (a text message, an image, etc.) deemed to be of interest to other people at a certain area is tagged with geographical coordinates of that area. This area is referred to as the anchor zone of the message \cite{floating-content-1}. Each message has two main properties namely \textit{Center} and \textit{Availability/anchor zone}. For the sake of simplicity, the anchor zone is defined as a circle with a radius. In short, floating messages can be relayed to other nodes inside the anchor zone. Every time a copy of the message is made, the anchor zone properties are copied to make sure that the copied message has the same anchor zone as the original message.
 
 Whenever a message is generated, it is assigned an anchor zone (identified by a radius and the node's current location). The message is transferred to other nodes in the anchor zone. Whenever a node moves out of the anchor zone, it may delete its copy of the message or keep it until first interaction with another node depending on the configuration.
+\subsection {System Operation \cite{Ott2011FloatingCI}}
+A node generates an information item/message \textit{I} of size \textit{s(I)} with a certain lifetime (\textit{TTL}) and assigns an anchor zone with center \textit{C} and two radii \textit{a} and \textit{r}. The difference between \textit{a} and \textit{r} is listed below:
+
+\begin{enumerate}
+  \item \textbf{Availability zone (\textit{a})}: \textit{a} defines the availability zone of the item, which is the region/zone within which the item \textit{I} is still kept around with a limited probability. In other words, this is the region/zone where the item \textit{I} can exist.
+  \item \textbf{Replication zone (\textit{r})}: \textit{r} defines the replication zone of the item, which is the region/zone within which the node always try to replicate the item to any other node it encounters.
+\end{enumerate}
+\vspace{3mm}
+If two nodes \textit{A} and \textit{B} meet in the anchor zone (or replication zone to be specific) and \textit{A} has a copy of \textit{M} while \textit{B} does not, then \textit{A} replicates message \textit{M} to \textit{B}. Theoretically, every node in the anchor zone should have a copy of the message. However, practically it is not a possibility due to limited storage of the nodes.
+\vspace{3mm}
+Let us explain the whole phenomenon with an example:
+Assuming we have 2 nodes (\textit{A} and \textit{B}). For the sake of simplicity, we assume there is only 1 item/message \textit{I} generated by \textit{A} with availability range \textit{a} and replication zone \textit{r}. Node \textit{B} now comes into the availability range \textit{a} of \textit{I}, however, nothing happens (but the \textit{I} still exists on \textit{A}). Now \textit{B} enters the replication range \textit{r} or \textit{I}. When \textit{B} comes in contact with \textit{A} inside the replication zone, a copy of \textit{I} is transferred to \textit{B}. Both \textit{A} and \textit{B} keep copy of the item until they are inside \textit{a} (assuming we have unlimited storage).
+
 \begin{figure}[h]
 \centering
 \includegraphics{./figures/anchor-zone}
 \caption{Floating-Content and its anchor zone \cite{floating-content}}
+\label{fig:floating-content}
 \end{figure}
-\newpage
-\subsection{Floating Content and ONE Simulator}
-Before continuing the discussion on Floating Content and its implementation in the ONE simulator, let us introduce a few concepts.
-\begin{center}
-    \captionof{table}{Floating Content: Imporant Concepts} \label{tab:title}
-    \begin{tabular}{ | l | p{11cm} |}
-    \hline
-    \textbf{Concept} & \textbf{Detail} \\ \hline
-    \textit{interval} & minimum time between generation of two messages by the same node. \\ \hline
-    \textit{radius (r)} & the replication range for floating message.  \\ \hline
-    \textit{anchor (a)} & the availability range of the floating message. \\ \hline
-    \textit{time to live (ttl)} & The message life (seconds) for the floating message. \\ \hline
-    \textit{size} & The size of the floating message. \\ \hline
-    \textit{replicationPolicy} & dictates how floating messages are replicated when the node comes in contact with another node. \\ \hline
-    \textit{deletionPolicy} & dictates when floating messages are deleted. \\ \hline
-    \end{tabular}
-\end{center}
-\begin{center}
-    \captionof{table}{Floating Content: Replication Policies} \label{tab:title}
-    \begin{tabular}{ | l | p{8cm} |}
-    \hline
-    \textbf{Replication Policy} & \textbf{Detail} \\ \hline
-    \textit{first in first out (fifo)} & messages are replicated in the order they are found in the buffer. This is the default replication policy.\\ \hline
-    \textit{random shuffle (rnd)} & Shuffle and select messages randomly for replication. \\ \hline
-    \textit{smallest anchor zone first (saf)} & messages with the smallest anchor zone are replicated first.  \\ \hline
-    \textit{smallest cylinder (radius) first (svf)} & messages with the smallest cylinder \textit{(anchor * message size)} are replicated first. \\ \hline
-    \textit{smallest cylinder (area) first (svf2)} & messages with the smallest cylinder \textit{(anchor * anchor * message size)} are replicated first. \\ \hline
-    \textit{smallest total (radius) first (stf)} & messages with the smallest total \textit{(anchor * ttl * message size)} are replicated first. \\ \hline
-    \textit{smallest total (area) first (stf2)} & messages with the smallest total \textit{(anchor * anchor * ttl * message size)} are replicated first. \\ \hline
+Figure ~\ref{fig:floating-content} shows the availability zone (\textit{a}) of the item, which is the outer circle. It also shows the replication zone (\textit{r}) of the item, which is the inner circle. Inside the inner circle (which represents \textit{r}), the item (depicted by the black dot) is copied to other nodes. However, outside the inner circle and inside the outer circle (which represents \textit{a}), the item still exists but is not replicated. However, the item cease to exist outside \textit{a}.
 
-    \end{tabular}
-\end{center}
-\newpage
-\begin{center}
-    \captionof{table}{Floating Content: Deletion Policies} \label{tab:title}
-    \begin{tabular}{ | l | p{11cm} |}
-    \hline
-    \textbf{Deletion Policy} & \textbf{Detail} \\ \hline
-    \textit{Encounter} & the message is deleted outside the anchor zone on first encounter with another node. The advantage/use case is that the node still cariies the message if it leaves the anchor zone for a short period of time (and does not enouncter another node during that period). It is the default policy in ONE Simulator. \\ \hline
-    \textit{Immediate} & the message is deleted as soon as the node leaves the anchor zone. \\ \hline
-    \end{tabular}
-\end{center}
+\subsection{Important Concepts}
+The following list summarizes the important concepts:
+\begin{enumerate}
+  \item \textbf{interval}: The minimum time between generation of two messages by the same node.
+  \item \textbf{replication range/zone (r)}: The replication range for floating message. It is the range/zone where the message can be replicated (transferred) to other nodes.
+  \item \textbf{availability range/zone (a)}: The availability range of the floating message. It is the range/zone where the message is still kept around with a limited probability.
+  \item \textbf{time to live (TTL)}: The life of the floating message.
+  \item \textbf{size}: The size of the floating message.
+  \item \textbf{replicationPolicy}: Policy which dictates how floating messages are replicated when the node comes in contact with another node.
+  \item \textbf{deletionPolicy}: Policy which dictates when floating messages are deleted.
+\end{enumerate}
+
+\subsection {Deletion Policy}
+As mentioned in the above list, deletion policy dictates when the floating messages are deleted. We currently have two policies, which are explained below:
+  \begin{enumerate}
+    \item \textbf{Immediate}: When this policy is used, the message is deleted as soon as the node (carrying the message) leaves the anchor zone (availability zone to be specific).
+    \item \textbf{Encounter}: When this policy is used, the message is deleted as soon as the node (carrying the message) comes in contact with the first node outside the anchor zone (availability zone to be specific). The advantage/use case is that the node still carries the message if it leaves the anchor zone for a short period of time (in case it does not encounter another node during that period). It is the default policy in ONE Simulator.
+  \end{enumerate}
+
+\subsection{The ONE Simulator and Floating Content}
+ONE simulator has inherent support for floating content. It handles all the functionality (such as replication of messages, dropping of messages etc.) of the floating message. The following section explains the main components of the ONE simulator used for floating content:
 
 \subsubsection{Components}
 The ONE Simulator has two main components for dealing with Floating Content which are \textit{FloatingApplication} and \textit{FloatingContentRouter}.

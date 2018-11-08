@@ -28,44 +28,52 @@
 	\end{center}
 
 	\subsubsection{OSM Maps}
-	The first step in getting the maps is to download the OSM map from the Open Street Map export tool \cite{openstreetmap-export}. Below is a depiction of the OSM Map for Central Munich.
+	The first step in getting the maps is to download the OSM map from the Open Street Map export tool \cite{openstreetmap-export}. Figure~\ref{fig:munich-map} shows the OSM Map for Central Munich.
 	\newline
 	\begin{figure}[h]
 		\centering
 		\includegraphics[scale=0.5]{./figures/central-munich-osm}
 		\caption{Central Munich OSM Map - from OpenStreetMaps \cite{openstreetmap}}
+		\label{fig:munich-map}
 	\end{figure}
 
 	\subsubsection{Conversion to WKT}
 	There are a number of tools that canconvert an OSM to WKT, however, there are a few reasons we do not use any of those tools:
 	\begin{itemize}
- 	 \item These tools do not make provide us with a fully connected maps. They just perform the conversion.
-   	 \item These tools do not convert the coordinates to the points-based system. Even though the resulting WKT file would work with the ONE simulator, however, the distances would be very small (as compared to the original). Let me give you an example, The distance between \textit{1.0001,1.2} and \textit{1.0002,1.2} in points is \textit{11m} while if we provide this directly to the ONE simulator the distance would be \textit{0.001 m (1 mm)}.
+ 	 \item These tools just perform the conversion (but do not make sure the converted maps are fully connected).
+   	 \item These tools do not convert the coordinates to the points-based system (which is used by the ONE simulator). To use any WKT file with the ONE simulator, we need to do proper coordinates conversion.
 	\end{itemize}
-
-	\begin{figure}[h]
+	\vspace{3mm}
+	Figure~\ref{fig:wkt-file} shows the contents of the WKT file. This file is generated using OpenJump \cite{openjump}, so they are in the normal coordinates system. In other words, these files are not in the coordinates system used by ONE simulator.
+	\vspace{2mm}
+	\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.55]{./figures/wkt-file-2}
 		\caption{Snapshot of WKT File Contents - Converted using OpenJump \cite{openjump} }
+		\label{fig:wkt-file}
 	\end{figure}
-
-	We have the OSM2WKT tool \cite{mayer2010osm} as it has solution for both of the above issues and can generate a full-connected point-based WKT file that can be used with the ONE Simulator.
-	\newline
-	\begin{figure}[h]
+	Using OSM2WKT tool \cite{mayer2010osm}, we can convert the OSM file to a fully-connected point-based WKT file that can be used with the ONE Simulator. Figure~\ref{fig:wkt-file-for-one} shows the contents of such a WKT file.
+	\vspace{2mm}
+	\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.55]{./figures/wkt-file-1}
 		\caption{Snapshot of WKT File Contents - Converted using OSM2WKT tool \cite{mayer2010osm} }
+		\label{fig:wkt-file-for-one}
 	\end{figure}
 	\newpage
-	Below is graphics depiction of the Central Munich WKT file.
-	\begin{figure}[h]
+	Figure~\ref{fig:central-munich-wkt} shows a fully connected WKT map of central Munich.
+	\vspace{6mm}
+	\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.5]{./figures/central-munich-wkt}
 		\caption{Central Munich WKT Map - Created using OSM2WKT tool \cite{mayer2010osm} and Screenshot using OpenJump \cite{openjump}}
+		\label{fig:central-munich-wkt}
 	\end{figure}
-
+	\vspace{3mm}
+We use the above map (Figure~\ref{fig:central-munich-wkt}) in our simulations. This map works fine with ONE simulator as it is a fully connected map and it has also been converted to the points based system used by ONE simulator.
 \newpage
 \subsection{Implementation}
+This section list and explains all the steps needed to configure and run a new map (downloaded from OpenStreetMap \cite{openstreetmap}) in ONE simulator.
 \subsubsection{OSM to WKT}
 Using OSM2WKT tool \cite{mayer2010osm}, any OSM file can be converted into a fully connected WKT file for use in the ONE simulator. Below are the details of how to use the OSM2WKT tool \cite{mayer2010osm} to generate a WKT file:\newline
 
