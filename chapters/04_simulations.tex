@@ -35,10 +35,10 @@ As mentioned above, We have grouped the simulations in Scenarios. Each of the Sc
 \end{enumerate}
 \newpage
 \subsection{Scenario 1.1: Validation of Access Point based connections}
-As mentioned in the earlier chapters, one of our goals was to implement Access Points based connectivity in the ONE Simulator. The main idea is to simulate the Access Point that we use in normal networks. It has already been mentioned that an Access Point can have three modes of operations: Access Point (AP), Adhoc and Station Adapter (SA). Below are the conditions/rules that are used for connectivity:
+As mentioned in the earlier chapters, one of our goals was to implement Access Points based connectivity in the ONE Simulator. The main idea is to simulate the Access Point that we use in normal networks. It has already been mentioned that an Access Point can have three modes of operations: Access Point (AP), Ad-hoc and Station Adapter (SA). Below are the conditions/rules that are used for connectivity:
 \begin{enumerate}
 	\item Station Adapters (SA) can only connect to Access Points (APs). The main idea is that Access Points serve different Station Adapters. A related example would be a mobile device connected to a wifi router. In this example, the mobile device is the Station Adapter (SA) and the wifi router is the Access Point (AP).
-   	\item A device in Adhoc mode can only connect to another device in Adhoc mode.
+   	\item A device in Ad-hoc mode can only connect to another device in Ad-hoc mode.
 \end{enumerate}
 In order to make sure that the above conditions/rules hold, We have created a simulation that records the connectivity (Connection UP and DOWN) when the connectivity status between the two nodes change. We are using a special report for this purpose which is basically recording the connectivity events for only Access-Point enabled clients. It is worth mentioning here that the normal clients (non-Access Point enabled) can co-exist with Access Point enabled clients but this report will not record connectivity events of the normal clients. We call this the \textit{ConnectivityWifiONEReport}.
 \vspace{3mm}
@@ -242,8 +242,7 @@ Before going into the discussion of results, below is a list of the different pa
 \end{enumerate}
 
 We are using all the 18 combinations of the above three parameters (from 1k-100-L to 1M-300-H). These combinations will be listed in the \textit{Message Size-Availability and Replication Zone-Nodes Count-Number of Hosts}) format.\newline\newline
-In each of the following scenarios, the performance of the network (measured in a fraction of Time-To-Live (TTL))is our benchmark for comparison. We will start with benchmarking each parameter individually, then a combination of two parameters and finally all of the parameters together (if needed).\newline
-
+In each of the following scenarios, the performance of the network (measured in a fraction of Time-To-Live (TTL))is our benchmark for comparison. We will start with benchmarking each parameter individually, then a combination of two parameters and finally all of the parameters together (if needed).
 \subsection{Scenario 1}
 In this Scenario, we are mainly interested in understanding and evaluating the effect of access points based setup on delay tolerant networks. To achieve this goal, we have run a number of simulations (with different parameters as stated above) which we will analyze below.
 \subsubsection{Message Size vs The fraction of TTL (time to live)}
@@ -251,34 +250,31 @@ Message size represents two important features of the system. The first is the m
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{./figures/scenario1_message_size}
+  \includegraphics[scale=0.43]{./figures/scenario1_message_size}
   \caption{Message Size vs The fraction of TTL (time to live)}
   \label{fig:scenario1_message_size}
 \end{figure}
 \subsubsection{Message Availability/Replication Zone vs The fraction of TTL (time to live)}
 Availability/Replication zones represent the area where a message can exist (and copied to other hosts). {\emph{Figure}~\ref{fig:scenario1_availability_zone} plots the availability zone vs the fraction of TTL (time to Live), regardless of the other two parameters i.e. message size and the number of hosts. This chart/figure shows that traditional hosts perform better than the access points enabled hosts when the availability/replication zone size is smaller. As the availability/replication zone size increases, the performance of access point enabled hosts increases at a good rate while that of the traditional hosts almost stay the same until 200 meters and then increases by a relatively small rate (w.r.t wifi enabled access points). In short, the performance of wifi enabled hosts increase with increase in the availability zone size.
-\begin{figure}[h]
+\begin{figure}[h!]
   \centering
-  \includegraphics[scale=0.5]{./figures/scenario1_availability_zone}
+  \includegraphics[scale=0.43]{./figures/scenario1_availability_zone}
   \caption{Availability Zone vs The fraction of TTL (time to live)}
   \label{fig:scenario1_availability_zone}
 \end{figure}
-
 \subsubsection{The number of hosts vs The fraction of TTL (time to live)}
 The number of hosts used is the simulations basically refer to the density of the hosts (which is either \textit{Low} or \textit{High}). \emph{Figure}~\ref{fig:scenario1_availability_zone} plots the availability zone vs fraction of TTL (time to live), regardless of the other two parameters i.e. message size and the number of hosts. This chart/figure shows that traditional hosts perform better than the access points enabled hosts when the availability/replication zone size is smaller. As the availability/replication zone size increases, the performance of access point enabled hosts increases at a good rate while that of the traditional hosts almost stay the same until 200 meters and then increases by a relatively small rate (w.r.t wifi enabled access points). In short, the performance of wifi enabled hosts increase with increase in size of the availability zone size.
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{./figures/scenario1_hosts_count}
+  \includegraphics[scale=0.4]{./figures/scenario1_hosts_count}
   \caption{Number of hosts vs The fraction of TTL (time to live)}
   \label{fig:scenario1_number_of_hosts}
 \end{figure}
 \newpage
-\vspace{3mm}
 \subsubsection{Message size and Availability zone size vs The fraction of TTL (time to live)}
 \emph{Figure}~\ref{fig:scenario1_message_size} and ~\ref{fig:scenario1_availability_zone} shows that message size and availability zones both have an effect on the performance (measured in a fraction of TTL (time to live)) of the network. In order to figure out which parameter has more influence on the system, we plot them together and then try to figure out which parameter has the main influence on the network performance.
 \emph{Figure}~\ref{fig:scenario1_message_size_availability_zone_1} plots the message size and availability zone vs fraction of TTL (time to live), regardless of the number of hosts. These charts/figures show that message size has the dominant effect on the network performance (measured in a fraction of TTL (time to live)). To come to this conclusion, we divide the graph into three main components w.r.t the availability zones. By looking into each of the components, there is a significant change in the message availability as the message size changes. Thus, confirming our observation that message size is the main component while the availability zone is a supplementary component. In other words, the performance (fraction of TTL (time to live) depends mainly on message size.\newline
 Our conclusion can be supported by \emph{Figure}~\ref{fig:scenario1_message_size_availability_zone_2}, where we interchange the two parameters, to have the chart visually grouped by message size instead of the availability zone.
-\newpage
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.55]{./figures/scenario1_message_size_availability_zone_1}
@@ -291,57 +287,55 @@ Our conclusion can be supported by \emph{Figure}~\ref{fig:scenario1_message_size
   \captionof{figure}{Message Size-Availability Zone vs The fraction of TTL (time to live)}
   \label{fig:scenario1_message_size_availability_zone_2}
 \end{figure}
-\newpage
+\vspace{4mm}
 \subsection{Scenario 2}
 In this scenario, our main goal is to compare the network performance (measured in a fraction of TTL (time to live)) with respect to the number of access points a message can snap to (also known as \textbf{k}).
 \subsubsection{Message Size, Availability Zone, Hosts Count vs The fraction of TTL (time to live)}
 Let us start by plotting the fraction of TTL (time to live) against all the three parameters (message size, availability zone, and  hosts count). \emph{Figure}~\ref{fig:scenario2_1_all_parameters} plots all the variables against the fraction of TTL (time to live). This chart/figure shows \textit{snapping to access points} perform better than \textit{no snapping}. Examining the figure closely reveals that the difference in performance is negligible in some cases while it is quite substantial in other cases.
-
-\begin{figure}[H]
+\begin{figure}[h!]
   \centering
-  \includegraphics[scale=0.45]{./figures/scenario2_1_all_parameters}
+  \includegraphics[scale=0.43]{./figures/scenario2_1_all_parameters}
   \captionof{figure}{Message Size-Availability Zone-Hosts Count vs The fraction of TTL (time to live)}
   \label{fig:scenario2_1_all_parameters}
 \end{figure}
-\vspace{3mm}
 \emph{Figure}~\ref{fig:scenario2_1_all_parameters} reveals that snapping to access points perform better than no snapping. We now need to understand if increasing the number of access points a message can snap to (also known as \textbf{k}) really increases the fraction of TTL (time to live). \newline \newline
 \emph{Figure}~\ref{fig:scenario2_1_2_all_parameters} plots the fraction of TTL (time to live) w.r.t the number of access points the message is snapped to (\textbf{k}). We are plotting for all the k-values we are supporting i.e. 0,1,2,3. In case of smaller message size (or higher node capacity), increasing \textbf{k} does not have any effect on the fraction of TTL (time to live). However, in case of large message size (>= 1M), increasing \textbf{k} have a positive effect on the fraction of TTL (time to live).
-\begin{figure}[H]
+\begin{figure}[h!]
   \centering
-  \includegraphics[scale=0.45]{./figures/scenario2_1_2_all_parameters}
+  \includegraphics[scale=0.42]{./figures/scenario2_1_2_all_parameters}
   \captionof{figure}{k (number of access points a message can snap to) vs The fraction of TTL (time to live)}
   \label{fig:scenario2_1_2_all_parameters}
 \end{figure}
-\vspace{3mm}
+\newpage
 In order to ascertain if the behavior depicted in \emph{Figure}~\ref{fig:scenario2_1_all_parameters} and \emph{Figure}~\ref{fig:scenario2_1_2_all_parameters}, we will take each of the individual components and evaluate its effect on the fraction of TTL (time to live) for k = 0,1,2,3.
-
 \subsubsection{Message Size vs The fraction of TTL (time to live)}
-\emph{Figure}~\ref{fig:scenario2_2_message_size} plots message size against the fraction of TTL (time to live).
+\emph{Figure}~\ref{fig:scenario2_2_message_size} plots message size against the fraction of TTL (time to live). This chart/figure shows that the case of no snapping (\textit{k=0}) performs worse than the other cases (\textit{k>0}). It also shows that when the message size is smaller (up to 50k), increasing \textbf{k} does not have any effect on the fraction of TTL (time to live). However, as the message size increases, increasing \textbf{k} have a positive effect on the fraction of TTL (time to live).
+
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.45]{./figures/scenario2_2_message_size}
+  \includegraphics[scale=0.4]{./figures/scenario2_2_message_size}
   \captionof{figure}{Message Size vs The fraction of TTL (time to live)}
   \label{fig:scenario2_2_message_size}
 \end{figure}
-The above chart/figure shows that the case of no snapping (\textit{k=0}) performs worse than the other cases (\textit{k>0}). It also shows that when the message size is smaller (up to 50k), increasing \textbf{k} does not have any effect on the fraction of TTL (time to live). However, as the message size increases, increasing \textbf{k} have a positive effect on the fraction of TTL (time to live).
 
 \subsubsection{Availability Zone vs The fraction of TTL (time to live)}
 \emph{Figure}~\ref{fig:scenario2_3_availability_zone} plots availability size against the fraction of TTL (time to live). This chart/figure shows that the case of no snapping (\textit{k=0}) always performs worse than the other cases (\textit{k>0}). It also shows that increasing \textbf{k} (when changing the availability) always have a positive effect on the fraction of TTL (time to live).
-\begin{figure}[H]
-  \centering
-  \includegraphics[scale=0.45]{./figures/scenario2_3_availability_zone}
-  \captionof{figure}{Availability Zone vs The fraction of TTL (time to live)}
-  \label{fig:scenario2_3_availability_zone}
-\end{figure}
 
 \subsubsection{Number of Hosts vs The fraction of TTL (time to live)}
 \emph{Figure}~\ref{fig:scenario2_4_hosts_count} plots number of hosts against the fraction of TTL (time to live). This chart/figure shows that the case of no snapping (\textit{k=0}) always performs worse than the other cases (\textit{k>0}). It also shows that the increasing \textbf{k} (when changing the number of hosts) always have a positive effect on the fraction of TTL (time to live). In other words, higher values of \textbf{k} almost always correspond to a better fraction of TTL (time to live) than lower values.
-
+\vspace{1mm}
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.45]{./figures/scenario2_4_hosts_count}
+  \includegraphics[scale=0.39]{./figures/scenario2_3_availability_zone}
+  \captionof{figure}{Availability Zone vs The fraction of TTL (time to live)}
+  \label{fig:scenario2_3_availability_zone}
+\end{figure}
+\vspace{2mm}
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.39]{./figures/scenario2_4_hosts_count}
   \captionof{figure}{Number of Hosts vs The fraction of TTL (time to live)}
   \label{fig:scenario2_4_hosts_count}
 \end{figure}
-\vspace{3mm}
+\vspace{1mm}
 This marks the completion of our simulations and the analysis of their results. Using the analysis in this chapter, We would infer the results and discuss them in the next chapter.
