@@ -2,3 +2,538 @@
 % Add the above to each chapter to make compiling the PDF easier in some editors.
 
 \chapter{Appendix}\label{chapter:appendix}
+This appendix explains all the configurations that we have used in our simulations. In other words, we explain how you can reproduce our simulations by using the details in this chapter. Before going ahead, let me explain the three main components of our configurations:
+
+\begin{itemize}
+  \item Static Configurations
+  \item Configuration Generation Scripts
+  \item Simulation Runners
+\end{itemize}
+
+The following sections would explain each of the above components in details.
+
+\section{Static Configurations}
+Static Configuratins are non-changeable configurations. In other words, these are the configuration that are same for all the simulations. We are using two simulation files for such configuration. One is known as \textit{default\_settings.txt} and the other is \textit{floating\_app.txt}. Both of these files will be explained in details in their own sub-section.
+
+\subsection{Default Settings}
+The file (default\_settings.txt) contains all the general settings. In our case, it only contains the \textit{Map file to be used} and some optimization settings. Below is a snapshot of this file.
+
+\begin{lstlisting}[language=bash]
+# 1.
+MapBasedMovement.nrofMapFiles = 1
+MapBasedMovement.mapFile1 = data/maps/central_munich/map.wkt
+
+# 2.
+Optimization.cellSizeMult = 5
+Optimization.randomizeUpdateOrder = true
+\end{lstlisting}
+\captionof{lstlisting}{default\_settings.txt}
+\vspace{4mm}
+The above listing is explain in details below:
+\begin{enumerate}
+  \item Here we are specifying that we are using 1 map file for simulation, name of the file is map.wkt and it is located at data/maps/central\_munich/.
+  \item Here are setting some optimizations. These optimizations affect the speed of the simulation. In our case, we are just using the default optimization settings.
+\end{enumerate}
+
+The following subsection contains the second static configuration file we will be using.
+
+\subsection{Floating Application Settings}
+The file (floating\_app.txt) contains all the general floating content related settings such as \textit{message size and ttl} etc. Below is a snapshot of this file.
+ \begin{lstlisting}[language=bash]
+# 1.
+floatingApp.type = FloatingApplication
+floatingApp.seed = [1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+floatingApp.destination = 0
+
+# 2.
+floatingApp.startTime = 0
+floatingApp.interval = 1800
+
+# 3.
+floatingApp.messageSize = 50k
+floatingApp.ttl = 300
+
+# 4.
+floatingApp.mode = variable
+
+# 5.
+floatingApp.anchor = 0,0,500,500
+floatingApp.anchorMax = 200,200,500,500
+
+# 6.
+floatingApp.anchorGranularity = 0,0,100,100
+
+# 7.
+FloatingContentRouter.replicationPolicy = none
+FloatingContentRouter.replicationAlgorithm = none
+FloatingContentRouter.deletionAlgorithm = none
+FloatingContentRouter.seed = [1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+\end{lstlisting}
+\captionof{lstlisting}{floating\_app.txt}
+\vspace{4mm}
+The above listing is explain in details below:
+\begin{enumerate}
+  \item Here we are defining the type of \textit{floatingApp} to be \textit{Floating Application}. We are also defining a global destination for all the messages (0 means the destination is unreachable). We are also defining run-indexed seed (seed is used for random number generation).
+  \item Here we are defining the start time and interval for floating message generation. The first message is generated at \textit{startTime} and the next message is uniformly chosen from [startTime + 0.75*interval ; startTime + 1.25 * interval]].
+  \item Here we are setting the size of the message (50 kilobytes) and time-to-live (ttl) of the message (to 300 minutes).
+  \item We are setting the anchor mode to variable, which means that the anchor zone is created w.r.t the current location of the message generating node.
+  \item Here we are specifying the \textit{anchor (x,y,r,a)} and max \textit{anchor (xmax,ymax,rmax,amax)} of the floating message. In case of variable mode (which is the one we are using), the anchor specifies the lower bound and max anchor specifies the upper bound of the anchor zone. In other words, \textit{(x,y) and (xmax,ymax)} define the anchor zone. The unit for \textit{r} \textit{[r,rmax] and [a,amax]} shows the interval from which a and amax are selected. We are keeping the \textit{a = r = amax = rmax}. The values for \textit{a} and \textit{r} are in meters.
+  \item Here we are setting the anchor granularity \textit{(xg,yg,rg,ag)}. \textit{xg and yg} defines the step-size at which content maybe floated, while \textit{rg and ag} defines the granularity at which the respective ranges are chose.
+  \item Here we are setting the replication and deletion policies as well as seed for the floating content router.
+\end{enumerate}
+The next section explains the scripts we are using for generating the dynamic configuration files.
+
+\section{Configuration Generation Scripts}
+This section contains the configuration generation scripts as well as some sample generated configuration files. We assume that these scripts are placed in a subfolder (one level inside the ONE simulator). In other words, going one folder back from this folder should take us to the main folder of ONE simulator (which is the folder containing \textit{one.sh} or \textit{one.bat} file).
+
+\subsection{Scenario 1}
+Here we will explain the configuration generation scripts for the first scenario. The script is annotated inline using comments (starting with \# symbol). Below is the script we are using for generating the configuration.
+\begin{lstlisting}[language=bash]
+#!/bin/bash
+
+# List of command line arguments to pass to this script
+  # ${1} Scenario Name
+  # ${2} Interface Type
+  # ${3} Router
+  # ${4} Nr of hosts
+  # ${5} Simulation Type (it can either be adhoc or ap-sa but it will only work if ${2} is WifiInterface)
+  # ${6} Message Size
+  # ${7} Anchor Size
+
+# 1.
+outputfilepath="settings/scenario_${1}_${6}_${7}_${4}.txt"
+
+# 2.
+echo "Scenario.name = simulation_%%Scenario.runCount%%" >> $outputfilepath
+
+# 3.
+echo "Scenario.simulateConnections = true" >> $outputfilepath
+
+# 4.
+echo "Scenario.updateInterval = 0.1" >> $outputfilepath
+
+# 5.
+echo "Scenario.runCount = [1; 2; 3; 4; 5; 6; 7; 8; 9; 10]" >> $outputfilepath
+
+# 6.
+echo "Scenario.endTime = 43200" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# 7.
+echo "Scenario.nrofHostGroups = 3" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# 8.
+echo "MovementModel.rngSeed = 1" >> $outputfilepath
+
+
+# 9.
+echo "MovementModel.worldSize = 1940,1515" >> $outputfilepath
+
+# 10.
+echo "MovementModel.warmup = 1000" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# 11.
+echo "interface.type = ${2}" >> $outputfilepath
+
+# 12.
+echo "interface.transmitSpeed = 50k" >> $outputfilepath
+
+# 13.
+echo "interface.transmitRange = 40" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# 14.
+if [[ ${3} = "FloatingContentRouter" ]]; then
+	echo "Group.nrofApplications = 1" >> $outputfilepath
+	echo "Group.application1 = floatingApp" >> $outputfilepath
+else
+	echo "Group.nrofApplications = 0" >> $outputfilepath
+fi
+
+# Common settings for all the groups
+# 15.
+echo "Group.movementModel = MapBasedMovement" >> $outputfilepath
+
+# 16.
+echo "Group.router = ${3}" >> $outputfilepath
+
+# 17.
+echo "Group.bufferSize = 5M" >> $outputfilepath
+
+# 18.
+echo "Group.waitTime = 0, 120" >> $outputfilepath
+
+# 19.
+echo "Group.speed = 0.05, 0.15" >> $outputfilepath
+
+# 20.
+echo "Group.msgTtl = 300" >> $outputfilepath
+
+# 21.
+echo "Group.nrofHosts = ${4}" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# 22.
+echo "Group.nrofInterfaces = 1" >> $outputfilepath
+echo "Group.interface1 = interface" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# 23.
+if [[ ${2} = "WifiInterface" ]]; then
+	if [[ ${5} = "adhoc" ]]; then
+		echo "Group1.groupID = AD" >> $outputfilepath
+		echo "Group1.mode = adhoc" >> $outputfilepath
+	else
+		echo "Group1.groupID = AP" >> $outputfilepath
+		echo "Group1.mode = ap" >> $outputfilepath
+		echo "Group1.nrofApplications = 0" >> $outputfilepath
+	fi
+else
+	echo "Group1.groupID = P" >> $outputfilepath
+fi
+
+# 24.
+echo "Group1.movementModel = StationaryMapBasedMovement" >> $outputfilepath
+
+# 25.
+if (( ${4} >= 50 )); then
+echo "Group1.routeFile = data/maps/central_munich/APs/every_200th_ap.wkt" >> $outputfilepath
+echo "Group1.nrofHosts = 132" >> $outputfilepath
+else
+echo "Group1.routeFile = data/maps/central_munich/APs/every_400th_ap.wkt" >> $outputfilepath
+echo "Group1.nrofHosts = 66" >> $outputfilepath
+fi
+
+echo "Group2.groupID = C" >> $outputfilepath
+
+# 26.
+if [[ ${2} = "WifiInterface" ]]; then
+	if [[ ${5} = "adhoc" ]]; then
+		echo "Group2.mode = adhoc" >> $outputfilepath
+	else
+		echo "Group2.mode = sa" >> $outputfilepath
+	fi
+fi
+
+# 27.
+echo "Group2.speed = 2.7, 13.9" >> $outputfilepath
+
+# 28.
+echo "Group2.okMaps = 1" >> $outputfilepath
+
+echo "Group3.groupID = P" >> $outputfilepath
+
+# 29.
+if [[ ${2} = "WifiInterface" ]]; then
+		if [[ ${5} = "adhoc" ]]; then
+			echo "Group3.mode = adhoc" >> $outputfilepath
+		else
+			echo "Group3.mode = sa" >> $outputfilepath
+		fi
+fi
+
+# 30.
+if (( ${4} >= 50 )); then
+echo "Group3.nrofHosts = 100" >> $outputfilepath
+else
+echo "Group3.nrofoHosts = $((${4} + ((${4}/2))))" >> $outputfilepath
+fi
+printf "\n" >> $outputfilepath
+
+# 31.
+prefix=""
+if [[ ${3} = "FloatingContentRouter" ]]; then
+	prefix="fcr_"
+else
+	prefix="er_"
+fi
+
+if [[ ${2} = "WifiInterface" ]]; then
+	prefix="${prefix}wifi_"
+	if [[ ${5} = "adhoc" ]]; then
+		prefix="${prefix}adhoc"
+	else
+		prefix="${prefix}apsa"
+	fi
+else
+	prefix="${prefix}nonwifi"
+fi
+
+printf "\n" >> $outputfilepath
+
+# 32.
+echo "floatingApp.anchor = 485,379,${7},${7}" >> $outputfilepath
+echo "floatingApp.anchorMax = 1455,1136,${7},${7}" >> $outputfilepath
+echo "floatingApp.anchorGranularity = 0,0,100,100" >> $outputfilepath
+
+# 33.
+echo "floatingApp.messageSize = ${6}" >> $outputfilepath
+printf "\n" >> $outputfilepath
+
+# 34.
+echo "Report.reportDir=simulations/reports/Scenario1/${6}-${7}-${4}/${prefix}/"$(date "+%Y-%m-%d %H%M%S") >> $outputfilepath
+reports=( "MessageReport" "MessageStatsReport" "DistanceDelayReport" "DeliveredMessagesReport" "MessageDeliveryReport")
+if [[ ${3} = "FloatingContentRouter" ]]; then
+	reports=( "FloatingMessageSummaryReport" "ConnectivityWifiONEReport")
+fi
+
+# 35.
+echo "Report.nrofReports=${#reports[@]}" >> $outputfilepath
+
+# 36.
+echo "Report.warmup=1000" >> $outputfilepath
+echo "Report.granularity=1000" >> $outputfilepath
+
+# 37.
+printf "\n" >> $outputfilepath
+counter=1
+while [ $counter -le ${#reports[@]} ]
+do
+	echo "Report.report$counter=${reports[$(($counter-1))]}" >> $outputfilepath
+	counter=$(( $counter + 1 ))
+done
+
+# 38.
+cd ..
+
+# 39.
+./one.sh -b 10 floating_app.txt simulations/$outputfilepath
+\end{lstlisting}
+\captionof{lstlisting}{Scenario 1: Configuration Generation Script}
+\vspace{5mm}
+
+Below is a detailed explanation of the above script.
+\begin{enumerate}
+  \item We are setting the output file name for the configuration. The file is named as \textti{scenario\_ScenarioName\_MessageSize\_AnchorSize\_HostsCount.txt}. We need to make sure that the settings folder is already created.
+  \item We are setting name of the scenario. Here, We are using value-filling to get the scenario name number from \textit{Scenario.runCount} using value filling.
+  \item We are making sure that the connections are simulated in this scenario.
+  \item We are setting the update interval (which is basically the speed) of the simulation.
+  \item We are setting an arbitrary variable (runCount) used for naming the scenario.
+  \item We are setting the scenario's end time (total duration) to 43200 seconds (or 12 hours).
+  \item We define the total number of node/hosts groups for the scenario.
+  \item We are setting the seed for movement model. This seed is used for random number generation. A number of parameters of movement models are generated using random numbers. Using the same seed provides us with the same random numbers.
+  \item We are setting the size of the movement model (width, height). The munich map we are using is 1940 meters wide and 1515 meters long.
+  \item We are setting the warm up time for the movement models. This is the time when no interaction happens between the hosts.
+  \item We are setting the communication interface type to be used in this simulation. It is passed using the second command line parameter i.e. \${2}.
+  \item We are setting the transmission speed for the communication interface.
+  \item We are setting the transmission range (in meters) for the interface.
+  \item We are setting the application to \textit{floatingApp} for floating content router only. For other routers, we are setting the number of applications to 0.
+  \item We are setting the movement model for all the groups.
+  \item We are setting the router for all the groups. It is passed using the third command line parameter i.e. \${3}.
+  \item We are setting the storage capacity (buffer size) of the nodes.
+  \item We are setting the wait time in seconds (minimum, maximum) for the nodes. It is the amount of time the the hosts wait after reaching destination.
+  \item We are setting the speed in m/s(minimum, maximum) for nodes of all groups. We are defining the walking speed to be the default speed.
+  \item We are setting the message's time-to-live(TTL) to 300 minutes (5 hours).
+  \item We are setting the number of hosts per group. It is passed using the fourth command line parameter i.e. \${4}.
+  \item We are setting the interfaces for all the groups.
+  \item We are setting the mode of the first group to either adhoc or access point depending on the fifth cammand line parameter i.e. \${5}. In case of acess points, we are not attaching \textit{floatingApp} as access points are not supposed to generated messages.
+  \item We are setting the movement model for Group 1.
+  \item We are setting the number of hosts for Group 1. In case number of hosts i.e. \${4} is greater than or equal 50, we are using 132 hosts. Otherwise, We are using 66 hosts.
+  \item We are setting the correct mode for hosts of Group 2 based on the fifth command line parameters.
+  \item Group2 is used to simulate cars, so we are setting higher speeds(2.7 - 13.9 m/s = 10-50 km/h).
+  \item We are making sure that cars can only drive on roads.
+  \item We are setting the correct mode for hosts of Group 3 based on the fifth command line argument.
+  \item In case number of hosts is greater than or equal to 50, we are using 100 as the total hosts otherwise we are using lower number.
+  \item We are calculating the prefix that determines the subfolder for reports.
+  \item We are setting the anchor properties. These settings override the settings from floating\_app.txt.
+  \item We are setting the message size. This setting overrides the settings from floating\_app.txt.
+  \item We are setting the reports directory as well as the reports that we are interested in.
+  \item We are setting the number of reports to generate.
+  \item We are setting the warm-up time for reports to 1000 seconds. It means that nothing will be reported until 1000 seconds.
+  \item We are providing the names of (classes of) the report files we are interested in.
+  \item Going one directory back to the directory of \textit{one.sh}.
+  \item Starting ONE simulator in batch mode with 10 consecutive runs.
+
+\end{enumerate}
+
+The next sub-section explains the configuration generation script for the second scenario.
+\subsection{Scenario 2}
+Below is the script we are using for generating the configuration for scenario 2.
+
+\begin{lstlisting}[language=bash]
+#!/bin/bash
+
+# List of command line arguments to pass to this script
+  # ${1} Scenario Name
+  # ${2} kNextAPs
+  # ${3} Hosts
+  # ${4} Message Size
+  # ${5} anchor
+
+# Output file name for the configuration (make sure settings folder is already created). The file is named as  scenario_ScenarioName_kNextAPs_AnchorSize_MessageSize_HostsCount.txt
+outputfilepath="settings/scenario2/scenario_${1}_${2}_${4}_${5}_${3}.txt"
+
+# Setting name of the scenario (We are using value filing to get the scenario number from Scenario.runCount using value filing)
+echo "Scenario.name = simulation_%%Scenario.runCount%%" >> $outputfilepath
+
+# We are making sure that the connections are simulated in this scenario
+echo "Scenario.simulateConnections = true" >> $outputfilepath
+
+# We are setting the update interval (which is basically the speed) of the simulation
+echo "Scenario.updateInterval = 0.1" >> $outputfilepath
+
+# This is an arbitrary variable used for naming the scenario
+echo "Scenario.runCount = [1; 2; 3; 4; 5; 6; 7; 8; 9; 10]" >> $outputfilepath
+
+
+# We are setting the scenario's end time (total duration) to 43200s (or 12 hours)
+echo "Scenario.endTime = 43200" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# We define the total number of node/hosts groups for the scenario.
+echo "Scenario.nrofHostGroups = 3" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# Setting the seed for movement model (which is used for random number generation). A number of parameters of movement models are generated using random numbers. Having the same seed produces the same random numbers.
+echo "MovementModel.rngSeed = 1" >> $outputfilepath
+
+# Setting up size of the movement model (width, height). The munich map we are using is 1940 meters wide and 1515 meters long.
+echo "MovementModel.worldSize = 1940,1515" >> $outputfilepath
+
+# Setting up the warm up time for the movement models.
+echo "MovementModel.warmup = 1000" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# setting up the communication interface type to be used in this simulation. Since this simulation is related to access points, we always use WifiInterface.
+echo "interface.type = WifiInterface" >> $outputfilepath
+
+# Setting up the transmission speed for the communication interface
+echo "interface.transmitSpeed = 50k" >> $outputfilepath
+
+# setting up the transmission range (in meters) for the interface
+echo "interface.transmitRange = 40" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# Setting floatingApplication to be used by all the groups
+echo "Group.nrofApplications = 1" >> $outputfilepath
+echo "Group.application1 = floatingApp" >> $outputfilepath
+
+# Setting movement model for all the groups
+echo "Group.movementModel = MapBasedMovement" >> $outputfilepath
+
+# Setting the router for all the groups
+echo "Group.router = FloatingContentRouter" >> $outputfilepath
+
+# Setting the storage capacity (buffer size) of the nodes
+echo "Group.bufferSize = 5M" >> $outputfilepath
+
+# Setting the wait time in seconds (minimum, maximum) for the nodes after reaching destination
+echo "Group.waitTime = 0, 120" >> $outputfilepath
+
+# Setting up the speed in m/s(minimum, maximum) for nodes of all groups. We are defining the default speed to be walking speed
+echo "Group.speed = 0.05, 0.15" >> $outputfilepath
+
+# Setting message's time-to-live(TTL) to 300 minutes (5 hours)
+echo "Group.msgTtl = 300" >> $outputfilepath
+
+#Setting the number of hosts per group (which is passed using command line (${3})).
+echo "Group.nrofHosts = ${3}" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# Setting the interfaces for all the groups.
+echo "Group.nrofInterfaces = 1" >> $outputfilepath
+echo "Group.interface1 = interface" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# Setting up first group as access point
+echo "Group1.groupID = AP" >> $outputfilepath
+echo "Group1.mode = ap" >> $outputfilepath
+
+# setting the movement model for group 1 (We are using group 1 to stationary hosts)
+echo "Group1.movementModel = StationaryMapBasedMovement" >> $outputfilepath
+
+# In case number of hosts (${4}) >= 50, we are using 132 hosts, otherwise we are using 66 hosts for group 1.
+if (( ${3} >= 50 )); then
+echo "Group1.routeFile = data/maps/central_munich/APs/every_200th_ap.wkt" >> $outputfilepath
+echo "Group1.nrofHosts = 132" >> $outputfilepath
+else
+echo "Group1.routeFile = data/maps/central_munich/APs/every_400th_ap.wkt" >> $outputfilepath
+echo "Group1.nrofHosts = 66" >> $outputfilepath
+fi
+
+# Setting number of applications for access points (group 1) to 0 as access points don't generate messages.
+echo "Group1.nrofApplications = 0" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# setting Group2 & Group 3 hosts to be station adapters (sa)
+echo "Group2.groupID = C" >> $outputfilepath
+echo "Group2.mode = sa" >> $outputfilepath
+
+echo "Group3.groupID = P" >> $outputfilepath
+echo "Group3.mode = sa" >> $outputfilepath
+
+#We are using group2 to simulate cars, so the speed is higher (2.7 - 13.9 m/s = 10-50 km/h).
+echo "Group2.okMaps = 1" >> $outputfilepath
+
+# Making sure cars can only drive on roads
+echo "Group2.speed = 2.7, 13.9" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# In case number of hosts ${3} is greater than or equal to 50, we are using 100 as the total hosts otherwise we are using lesser number of hosts.
+if (( ${3} >= 50 )); then
+echo "Group3.nrofHosts = 100" >> $outputfilepath
+else
+echo "Group3.nrofoHosts = $((${3} + ((${3}/2))))" >> $outputfilepath
+fi
+
+printf "\n" >> $outputfilepath
+
+# Setting the number of access points a host can snap to (passed as command line argument (${2}))
+echo "FloatingContentRouter.kNextAPs = ${2}" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+# Setting the anchor properties. This will override the settings from floating_app.txt
+echo "floatingApp.anchor = 485,379,${5},${5}" >> $outputfilepath
+echo "floatingApp.anchorMax = 1455,1136,${5},${5}" >> $outputfilepath
+echo "floatingApp.anchorGranularity = 0,0,100,100" >> $outputfilepath
+
+# Setting the message size (this will also override the settings from floating_app.txt)
+echo "floatingApp.messageSize = ${4}" >> $outputfilepath
+printf "\n" >> $outputfilepath
+
+# setting up the reports directory as well as the reports that are of interest to us.
+echo "Report.reportDir=simulations/reports/Scenario2/${4}-${5}-${3}/k_${2}/"$(date "+%Y-%m-%d %H%M%S") >> $outputfilepath
+reports=("FloatingMessageSnapToAPSummaryReport" "FloatingMessageAnchorPointsReport")
+
+# setting the number of reports (count of reports array)
+echo "Report.nrofReports=${#reports[@]}" >> $outputfilepath
+
+# setting warm up time to 1000 seconds (which means the reports will start recording after the 100th second)
+echo "Report.warmup=1000" >> $outputfilepath
+echo "Report.granularity=1000" >> $outputfilepath
+
+printf "\n" >> $outputfilepath
+
+counter=1
+while [ $counter -le ${#reports[@]} ]
+do
+	echo "Report.report$counter=${reports[$(($counter-1))]}" >> $outputfilepath
+	counter=$(( $counter + 1 ))
+done
+
+# going one directory back
+cd ..
+
+# Starting ONE in batch mode with 10 runs
+./one.sh -b 10 floating_app.txt simulations/$outputfilepath
+
+\end{lstlisting}
