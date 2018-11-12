@@ -13,7 +13,7 @@ This appendix explains all the configurations that we have used in our simulatio
 The following sections would explain each of the above components in details.
 
 \section{Static Configurations}
-Static Configuratins are non-changeable configurations. In other words, these are the configuration that are same for all the simulations. We are using two simulation files for such configuration. One is known as \textit{default\_settings.txt} and the other is \textit{floating\_app.txt}. Both of these files will be explained in details in their own sub-section.
+Static Configurations are constant (non-changeable) configurations. In other words, these are the configuration that is the same for all simulations. We are using two simulation files for such a configuration. One is known as \textit{default\_settings.txt} and the other is \textit{floating\_app.txt}. Both of these files will be explained in details in their own sub-section.
 
 \subsection{Default Settings}
 The file (default\_settings.txt) contains all the general settings. In our case, it only contains the \textit{Map file to be used} and some optimization settings. Below is a snapshot of this file.
@@ -90,7 +90,7 @@ This section contains the configuration generation scripts as well as some sampl
 Here we will explain the configuration generation scripts for the first scenario. The script is annotated inline using comments (starting with \# symbol). Below is the script we are using for generating the configuration.
 \begin{lstlisting}[language=bash]
 #!/bin/bash
-
+# filename: scenario1-gen.sh
 # List of command line arguments to pass to this script
   # ${1} Scenario Name
   # ${2} Interface Type
@@ -127,7 +127,6 @@ printf "\n" >> $outputfilepath
 
 # 8.
 echo "MovementModel.rngSeed = 1" >> $outputfilepath
-
 
 # 9.
 echo "MovementModel.worldSize = 1940,1515" >> $outputfilepath
@@ -307,41 +306,41 @@ cd ..
 # 39.
 ./one.sh -b 10 floating_app.txt simulations/$outputfilepath
 \end{lstlisting}
-\captionof{lstlisting}{Scenario 1: Configuration Generation Script}
+\captionof{lstlisting}{Scenario 1: Configuration Generation Script (scenario1\_gen.sh)}
 \vspace{5mm}
 
 Below is a detailed explanation of the above script.
 \begin{enumerate}
-  \item We are setting the output file name for the configuration. The file is named as \textti{scenario\_ScenarioName\_MessageSize\_AnchorSize\_HostsCount.txt}. We need to make sure that the settings folder is already created.
-  \item We are setting name of the scenario. Here, We are using value-filling to get the scenario name number from \textit{Scenario.runCount} using value filling.
+  \item We are setting the output file name for the configuration. The file is named as \textit{scenario\_ScenarioName\_MessageSize\_AnchorSize\_HostsCount.txt}. We need to make sure that the settings folder is already created.
+  \item We are the setting name of the scenario. Here, We are using value-filling to get the scenario name number from \textit{Scenario.runCount} using value filling.
   \item We are making sure that the connections are simulated in this scenario.
   \item We are setting the update interval (which is basically the speed) of the simulation.
   \item We are setting an arbitrary variable (runCount) used for naming the scenario.
   \item We are setting the scenario's end time (total duration) to 43200 seconds (or 12 hours).
   \item We define the total number of node/hosts groups for the scenario.
   \item We are setting the seed for movement model. This seed is used for random number generation. A number of parameters of movement models are generated using random numbers. Using the same seed provides us with the same random numbers.
-  \item We are setting the size of the movement model (width, height). The munich map we are using is 1940 meters wide and 1515 meters long.
-  \item We are setting the warm up time for the movement models. This is the time when no interaction happens between the hosts.
-  \item We are setting the communication interface type to be used in this simulation. It is passed using the second command line parameter i.e. \${2}.
+  \item We are setting the size of the movement model (width, height). The Munich city map we are using is 1940 meters wide and 1515 meters long.
+  \item We are setting the warm-up time for the movement models. This is the time when no interaction happens between the hosts.
+  \item We are setting the communication interface type to be used in this simulation. It is passed using the second command line argument.
   \item We are setting the transmission speed for the communication interface.
   \item We are setting the transmission range (in meters) for the interface.
   \item We are setting the application to \textit{floatingApp} for floating content router only. For other routers, we are setting the number of applications to 0.
   \item We are setting the movement model for all the groups.
-  \item We are setting the router for all the groups. It is passed using the third command line parameter i.e. \${3}.
+  \item We are setting the router for all the groups. It is passed using the third command line argument.
   \item We are setting the storage capacity (buffer size) of the nodes.
-  \item We are setting the wait time in seconds (minimum, maximum) for the nodes. It is the amount of time the the hosts wait after reaching destination.
+  \item We are setting the wait time in seconds (minimum, maximum) for the nodes. It is the amount of time the hosts wait after reaching the destination.
   \item We are setting the speed in m/s(minimum, maximum) for nodes of all groups. We are defining the walking speed to be the default speed.
   \item We are setting the message's time-to-live(TTL) to 300 minutes (5 hours).
-  \item We are setting the number of hosts per group. It is passed using the fourth command line parameter i.e. \${4}.
+  \item We are setting the number of hosts per group. It is passed using the fourth command line argument.
   \item We are setting the interfaces for all the groups.
-  \item We are setting the mode of the first group to either adhoc or access point depending on the fifth cammand line parameter i.e. \${5}. In case of acess points, we are not attaching \textit{floatingApp} as access points are not supposed to generated messages.
+  \item We are setting the mode of the first group to either ad-hoc or access point depending on the fifth command line parameter. In the case of access points, we are not attaching \textit{floatingApp} as access points are not supposed to generate messages.
   \item We are setting the movement model for Group 1.
-  \item We are setting the number of hosts for Group 1. In case number of hosts i.e. \${4} is greater than or equal 50, we are using 132 hosts. Otherwise, We are using 66 hosts.
-  \item We are setting the correct mode for hosts of Group 2 based on the fifth command line parameters.
+  \item We are setting the number of hosts for Group 1. In case the number of hosts is greater than or equal 50, we are using 132 hosts. Otherwise, We are using 66 hosts.
+  \item We are setting the correct mode for hosts of Group 2 based on the fifth command line arguments.
   \item Group2 is used to simulate cars, so we are setting higher speeds(2.7 - 13.9 m/s = 10-50 km/h).
   \item We are making sure that cars can only drive on roads.
   \item We are setting the correct mode for hosts of Group 3 based on the fifth command line argument.
-  \item In case number of hosts is greater than or equal to 50, we are using 100 as the total hosts otherwise we are using lower number.
+  \item In case the number of hosts is greater than or equal to 50, we are using 100 as the total hosts otherwise we are using lower number.
   \item We are calculating the prefix that determines the subfolder for reports.
   \item We are setting the anchor properties. These settings override the settings from floating\_app.txt.
   \item We are setting the message size. This setting overrides the settings from floating\_app.txt.
@@ -360,7 +359,7 @@ Below is the script we are using for generating the configuration for scenario 2
 
 \begin{lstlisting}[language=bash]
 #!/bin/bash
-
+# file name: scenario2_gen.sh
 # List of command line arguments to pass to this script
   # ${1} Scenario Name
   # ${2} kNextAPs
@@ -368,95 +367,95 @@ Below is the script we are using for generating the configuration for scenario 2
   # ${4} Message Size
   # ${5} anchor
 
-# Output file name for the configuration (make sure settings folder is already created). The file is named as  scenario_ScenarioName_kNextAPs_AnchorSize_MessageSize_HostsCount.txt
+# 1.
 outputfilepath="settings/scenario2/scenario_${1}_${2}_${4}_${5}_${3}.txt"
 
-# Setting name of the scenario (We are using value filing to get the scenario number from Scenario.runCount using value filing)
+# 2.
 echo "Scenario.name = simulation_%%Scenario.runCount%%" >> $outputfilepath
 
-# We are making sure that the connections are simulated in this scenario
+# 3.
 echo "Scenario.simulateConnections = true" >> $outputfilepath
 
-# We are setting the update interval (which is basically the speed) of the simulation
+# 4.
 echo "Scenario.updateInterval = 0.1" >> $outputfilepath
 
-# This is an arbitrary variable used for naming the scenario
+# 5.
 echo "Scenario.runCount = [1; 2; 3; 4; 5; 6; 7; 8; 9; 10]" >> $outputfilepath
 
-
-# We are setting the scenario's end time (total duration) to 43200s (or 12 hours)
+# 6.
 echo "Scenario.endTime = 43200" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# We define the total number of node/hosts groups for the scenario.
+# 7.
 echo "Scenario.nrofHostGroups = 3" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# Setting the seed for movement model (which is used for random number generation). A number of parameters of movement models are generated using random numbers. Having the same seed produces the same random numbers.
+# 8.
 echo "MovementModel.rngSeed = 1" >> $outputfilepath
 
-# Setting up size of the movement model (width, height). The munich map we are using is 1940 meters wide and 1515 meters long.
+
+# 9.
 echo "MovementModel.worldSize = 1940,1515" >> $outputfilepath
 
-# Setting up the warm up time for the movement models.
+# 10.
 echo "MovementModel.warmup = 1000" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# setting up the communication interface type to be used in this simulation. Since this simulation is related to access points, we always use WifiInterface.
+# 11.
 echo "interface.type = WifiInterface" >> $outputfilepath
 
-# Setting up the transmission speed for the communication interface
+# 12.
 echo "interface.transmitSpeed = 50k" >> $outputfilepath
 
-# setting up the transmission range (in meters) for the interface
+# 13.
 echo "interface.transmitRange = 40" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# Setting floatingApplication to be used by all the groups
+# 14.
 echo "Group.nrofApplications = 1" >> $outputfilepath
 echo "Group.application1 = floatingApp" >> $outputfilepath
 
-# Setting movement model for all the groups
+# 15.
 echo "Group.movementModel = MapBasedMovement" >> $outputfilepath
 
-# Setting the router for all the groups
+# 16.
 echo "Group.router = FloatingContentRouter" >> $outputfilepath
 
-# Setting the storage capacity (buffer size) of the nodes
+# 17.
 echo "Group.bufferSize = 5M" >> $outputfilepath
 
-# Setting the wait time in seconds (minimum, maximum) for the nodes after reaching destination
+# 18.
 echo "Group.waitTime = 0, 120" >> $outputfilepath
 
-# Setting up the speed in m/s(minimum, maximum) for nodes of all groups. We are defining the default speed to be walking speed
+# 19.
 echo "Group.speed = 0.05, 0.15" >> $outputfilepath
 
-# Setting message's time-to-live(TTL) to 300 minutes (5 hours)
+# 20.
 echo "Group.msgTtl = 300" >> $outputfilepath
 
-#Setting the number of hosts per group (which is passed using command line (${3})).
+# 21.
 echo "Group.nrofHosts = ${3}" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# Setting the interfaces for all the groups.
+# 22.
 echo "Group.nrofInterfaces = 1" >> $outputfilepath
 echo "Group.interface1 = interface" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# Setting up first group as access point
+# 23.
 echo "Group1.groupID = AP" >> $outputfilepath
 echo "Group1.mode = ap" >> $outputfilepath
 
-# setting the movement model for group 1 (We are using group 1 to stationary hosts)
+# 24.
 echo "Group1.movementModel = StationaryMapBasedMovement" >> $outputfilepath
 
-# In case number of hosts (${4}) >= 50, we are using 132 hosts, otherwise we are using 66 hosts for group 1.
+# 25.
 if (( ${3} >= 50 )); then
 echo "Group1.routeFile = data/maps/central_munich/APs/every_200th_ap.wkt" >> $outputfilepath
 echo "Group1.nrofHosts = 132" >> $outputfilepath
@@ -465,27 +464,27 @@ echo "Group1.routeFile = data/maps/central_munich/APs/every_400th_ap.wkt" >> $ou
 echo "Group1.nrofHosts = 66" >> $outputfilepath
 fi
 
-# Setting number of applications for access points (group 1) to 0 as access points don't generate messages.
+# 26.
 echo "Group1.nrofApplications = 0" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# setting Group2 & Group 3 hosts to be station adapters (sa)
+# 27.
 echo "Group2.groupID = C" >> $outputfilepath
 echo "Group2.mode = sa" >> $outputfilepath
 
 echo "Group3.groupID = P" >> $outputfilepath
 echo "Group3.mode = sa" >> $outputfilepath
 
-#We are using group2 to simulate cars, so the speed is higher (2.7 - 13.9 m/s = 10-50 km/h).
+#28.
 echo "Group2.okMaps = 1" >> $outputfilepath
 
-# Making sure cars can only drive on roads
+# 29.
 echo "Group2.speed = 2.7, 13.9" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# In case number of hosts ${3} is greater than or equal to 50, we are using 100 as the total hosts otherwise we are using lesser number of hosts.
+# 30.
 if (( ${3} >= 50 )); then
 echo "Group3.nrofHosts = 100" >> $outputfilepath
 else
@@ -494,46 +493,219 @@ fi
 
 printf "\n" >> $outputfilepath
 
-# Setting the number of access points a host can snap to (passed as command line argument (${2}))
+# 31.
 echo "FloatingContentRouter.kNextAPs = ${2}" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
-# Setting the anchor properties. This will override the settings from floating_app.txt
+# 32.
 echo "floatingApp.anchor = 485,379,${5},${5}" >> $outputfilepath
 echo "floatingApp.anchorMax = 1455,1136,${5},${5}" >> $outputfilepath
 echo "floatingApp.anchorGranularity = 0,0,100,100" >> $outputfilepath
 
-# Setting the message size (this will also override the settings from floating_app.txt)
+# 33.
 echo "floatingApp.messageSize = ${4}" >> $outputfilepath
 printf "\n" >> $outputfilepath
 
-# setting up the reports directory as well as the reports that are of interest to us.
+# 34.
 echo "Report.reportDir=simulations/reports/Scenario2/${4}-${5}-${3}/k_${2}/"$(date "+%Y-%m-%d %H%M%S") >> $outputfilepath
 reports=("FloatingMessageSnapToAPSummaryReport" "FloatingMessageAnchorPointsReport")
 
-# setting the number of reports (count of reports array)
+# 35.
 echo "Report.nrofReports=${#reports[@]}" >> $outputfilepath
 
-# setting warm up time to 1000 seconds (which means the reports will start recording after the 100th second)
+# 36.
 echo "Report.warmup=1000" >> $outputfilepath
 echo "Report.granularity=1000" >> $outputfilepath
 
 printf "\n" >> $outputfilepath
 
 counter=1
+
+#37.
 while [ $counter -le ${#reports[@]} ]
 do
 	echo "Report.report$counter=${reports[$(($counter-1))]}" >> $outputfilepath
 	counter=$(( $counter + 1 ))
 done
 
-# going one directory back
+# 38.
 cd ..
 
-# Starting ONE in batch mode with 10 runs
+# 39.
 ./one.sh -b 10 floating_app.txt simulations/$outputfilepath
 
 \end{lstlisting}
+\captionof{lstlisting}{Scenario 2: Configuration Generation Script (scenario2\_gen.sh)}
+\vspace{5mm}
+\begin{enumerate}
+  \item We are setting the output file name for the configuration. The file is named as \textit{scenario\_ScenarioName\_kNextAPs\_AnchorSize\_MessageSize\_HostsCount.txt}. We need to make sure that the settings folder is already created.
+  \item We are setting name of the scenario. Here, We are using value-filling to get the scenario name number from \textit{Scenario.runCount} using value filling.
+  \item We are making sure that the connections are simulated in this scenario.
+  \item We are setting the update interval (which is basically the speed) of the simulation.
+  \item We are setting an arbitrary variable (runCount) used for naming the scenario.
+  \item We are setting the scenario's end time (total duration) to 43200 seconds (or 12 hours).
+  \item We define the total number of node/hosts groups for the scenario.
+  \item We are setting the seed for movement model. This seed is used for random number generation. A number of parameters of movement models are generated using random numbers. Using the same seed provides us with the same random numbers.
+  \item We are setting the size of the movement model (width, height). The Munich city map we are using is 1940 meters wide and 1515 meters long.
+  \item We are setting the warm-up time for the movement models. This is the time when no interaction happens between the hosts.
+  \item We are setting the communication interface type to be used in this simulation. Since this simulation is related to access points, we always use WifiInterface.
+  \item We are setting the transmission speed for the communication interface.
+  \item We are setting the transmission range (in meters) for the interface.
+  \item We are setting the application to \textit{floatingApp} for floating content router only. For other routers, we are setting the number of applications to 0.
+  \item We are setting the movement model for all the groups.
+  \item We are setting the router for all the groups. We are making sure all the groups use \textit{FloatingContentRouter}.
+  \item We are setting the storage capacity (buffer size) of the nodes.
+\item We are setting the wait time in seconds (minimum, maximum) for the nodes. It is the amount of time the hosts wait after reaching the destination.
+\item We are setting the speed in m/s(minimum, maximum) for nodes of all groups. We are defining the walking speed to be the default speed.
+\item We are setting the message's time-to-live(TTL) to 300 minutes (5 hours).
+\item We are setting the number of hosts per group. It is passed using the third command line argument.
+\item We are setting the interfaces for all the groups.
+\item We are setting the first group's hosts as access points.
+\item We are setting the Movement model for Group 1.
+\item We are setting the number of hosts for Group 1. In case the number of hosts is greater than or equal 50, we are using 132 hosts. Otherwise, We are using 66 hosts.
+\item We are setting the number of applications for access points (group 1) to 0 as access points don't generate messages.
+\item We are setting Group2 and Group 3 hosts to be station adapters (SA).
+\item We are making sure that cars can only drive on roads.
+\item Group2 is used to simulate cars, so we are setting higher speeds(2.7 - 13.9 m/s = 10-50 km/h).
+\item In case the number of hosts is greater than or equal to 50, we are using 100 as the total hosts otherwise we are using the the lower number.
+\item We are setting the number of access points a host can snap to. It is passed as the second command line argument.
+\item We are setting the anchor properties. These settings override the settings from floating\_app.txt.
+\item We are setting the message size. This setting overrides the settings from floating\_app.txt.
+\item We are setting the reports directory as well as the reports that we are interested in.
+\item We are setting the number of reports to generate.
+\item We are setting the warm-up time for reports to 1000 seconds. It means that nothing will be reported until 1000 seconds.
+\item We are providing the names of (classes of) the report files we are interested in.
+\item Going one directory back to the directory of \textit{one.sh}.
+\item Starting ONE simulator in batch mode with 10 consecutive runs.
+\end{enumerate}
+
+\section{Simulation Runners}
+This section combines the static configuration files as well as the configuration generation scripts to actually run the simulations for different combinations of message size, number of hosts and anchor zone size.
+
+\subsection{Scenario 1}
+Below are the two annotated script files we are using for this scenario.
+
+\begin{lstlisting}[language=bash]
+#!/bin/bash
+#file name: scenario1.sh
+
+# Making sure all the parameters are provided
+if [ -z "${1}" ] || [ -z "${2}" ] || [ -z "${3}" ]; then
+ echo "Missing arguments. Please use the following syntax:"
+ echo "./scenario1.sh messageSize availabilityZone hostCount"
+else
+
+# Running scenario1-gen.sh (the configuration generator) for the three different scenarios (non access points enabled hosts, adhoc hosts and access-points enabled hosts). We are using tmux so that each task starts in its own detachable process.
+
+tmux new -d -s fcr_wifi_apsa_${1}_${2}_${3} ./scenario1-gen.sh fcr_wifi_apsa WifiInterface FloatingContentRouter ${3} apsa ${1} ${2}
+sleep 1
+tmux new -d -s fcr_wifi_adhoc_${1}_${2}_${3} ./scenario1-gen.sh fcr_wifi_adhoc WifiInterface FloatingContentRouter ${3} adhoc ${1} ${2}
+sleep 1
+tmux new -d -s fcr_non_wifi_${1}_${2}_${3} ./scenario1-gen.sh fcr_non_wifi SimpleBroadcastInterface FloatingContentRouter ${3} apsa ${1} ${2}
+fi
+\end{lstlisting}
+\captionof{lstlisting}{Scenario 1: Intermediate script (scenario1.sh)}
+\vspace{5mm}
+Now, we have the configuration generator (\textit{scenario1-gen.sh}) and the intermediate script (\textit{scenario1.sh}) in place, we can use the final script to start simulation for all of our desired combinations. Below is the code for the final script (\textit{scenario1-runner.sh}).
+
+\begin{lstlisting}[language=bash]
+#!/bin/bash
+#file name: scenario1-runner.sh
+
+./scenario1.sh 1k 100 30
+./scenario1.sh 1k 100 50
+./scenario1.sh 1k 200 30
+./scenario1.sh 1k 200 50
+./scenario1.sh 1k 300 30
+./scenario1.sh 1k 300 50
+
+./scenario1.sh 50k 100 30
+./scenario1.sh 50k 100 50
+./scenario1.sh 50k 200 30
+./scenario1.sh 50k 200 50
+./scenario1.sh 50k 300 30
+./scenario1.sh 50k 300 50
+
+./scenario1.sh 1M 100 30
+./scenario1.sh 1M 100 50
+./scenario1.sh 1M 200 30
+./scenario1.sh 1M 200 50
+./scenario1.sh 1M 300 30
+./scenario1.sh 1M 300 50
+\end{lstlisting}
+\captionof{lstlisting}{Scenario 1: Final script (scenario1-runner.sh)}
+\vspace{5mm}
+We have all the scripts already in place now, we can easily use the following command to start the simulation:
+\begin{lstlisting}[language=bash]
+./scenario1-runner.sh
+\end{lstlisting}
+
+\subsection{Scenario 2}
+Scenario 2 has a similar setup as Scenario 1, however, the contents of the runner scripts are different. Below are the two annotated script files that we are using for this scenario.
+
+\begin{lstlisting}[language=bash]
+#!/bin/bash
+#file name: scenario2.sh
+
+# Making sure all the parameters are provided
+if [ -z "${1}" ] || [ -z "${2}" ] || [ -z "${3}" ]; then
+ echo "Missing arguments. Please use the following syntax:"
+ echo "./scenario2.sh messageSize availabilityZone hostCount"
+else
+
+# Running scenario2-gen.sh (the configuration generator) for the four different values snapping to accessing point(k=0,1,2,3).
+
+tmux new -d -s fcr_k_0_${1}_${2}_${3} ./scenario2-gen.sh k 0 ${3} ${1} ${2}
+sleep 1
+tmux new -d -s fcr_k_1_${1}_${2}_${3} ./scenario2-gen.sh k 1 ${3} ${1} ${2}
+sleep 1
+tmux new -d -s fcr_k_2_${1}_${2}_${3} ./scenario2-gen.sh k 2 ${3} ${1} ${2}
+sleep 1
+tmux new -d -s fcr_k_3_${1}_${2}_${3} ./scenario2-gen.sh k 3 ${3} ${1} ${2}
+
+fi
+\end{lstlisting}
+\captionof{lstlisting}{Scenario 2: Intermediate script (scenario2.sh)}
+\vspace{5mm}
+Now, we have the configuration generator (\textit{scenario1-gen.sh}) and the intermediate script (\textit{scenario1.sh}) in place, we can use the final script to start simulation for all of our desired combinations. Below is the code for the final script (\textit(scenario1-runner.sh)).
+
+\begin{lstlisting}[language=bash]
+#!/bin/bash
+#file name: scenario2-runner.sh
+
+./scenario2.sh 1k 100 30
+
+./scenario2.sh 1k 100 50
+./scenario2.sh 1k 200 30
+./scenario2.sh 1k 200 50
+./scenario2.sh 1k 300 30
+./scenario2.sh 1k 300 50
+
+./scenario2.sh 50k 100 30
+./scenario2.sh 50k 100 50
+./scenario2.sh 50k 200 30
+./scenario2.sh 50k 200 50
+./scenario2.sh 50k 300 30
+./scenario2.sh 50k 300 50
+
+./scenario2.sh 1M 100 30
+./scenario2.sh 1M 100 50
+./scenario2.sh 1M 200 30
+./scenario2.sh 1M 200 50
+./scenario2.sh 1M 300 30
+./scenario2.sh 1M 300 50
+
+\end{lstlisting}
+\captionof{lstlisting}{Scenario 2: Final script (scenario2-runner.sh)}
+\vspace{5mm}
+We have all the scripts already in place now, we can easily use the following command to start the simulation:
+\begin{lstlisting}[language=bash]
+./scenario2-runner.sh
+\end{lstlisting}
+
+\vspace{5mm}
+
+This marks the completion of all the steps needed to reproduce our simulation scenarios.
