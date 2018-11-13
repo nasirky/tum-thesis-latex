@@ -2,7 +2,7 @@
 % Add the above to each chapter to make compiling the PDF easier in some editors.
 
 \chapter{Conclusions}\label{chapter:conclusions}
-This chapter deals with the discussion of the results with respect to the research questions. We will list the research questions below and then answer them with respect to the outcome of the simulations (we have performed).\newline
+In this chapter, we will discuss what we have infered from the simulations and their results. This will enable us to understand and summarize the behavior of access points as well as snapping to access point in ONE simulator. We will list the research questions below and then answer them as per the outcome of the simulation).\newline
 
 \textbf{Q1: Modeling a city and exploring the impact of access points on the performance of geo-based information sharing.} \newline
 
@@ -21,3 +21,8 @@ Access points have an overall positive effect on the network. Below is a break-d
   \item Increasing \textbf{k} always has a positive effect regardless of the availability zone size. The average message life is always better for higher values of \textbf{k} than lower values.
   \item Increasing \textbf{k} always has a positive effect regardless of the number of hosts. The average message life is always better for higher values of \textbf{k} when compared to lower values.
 \end{enumerate}
+\section{Future Work}
+We can add a number of improvements to the features we have implemented. The following paragraph explains some of those improvements:\newline \newline
+The current behavior is that in case a host has a copy of the message, it will not accept new copy of the message. The disadvantage is that both the hosts might not have the updated information for the snapped access points. A feature would be to replicate this information (information about the access points the message is snapped to) between hosts even when a copy of the same message exists on that host.\newline \newline
+Another feature would be to have specific nodes (preferably access points) responsible for holding the access points snapping information of all messages. These nodes will read such information from all the hosts and will send them this information for the message it holds.\newline \newline
+Both of the above features would greatly improve the performance of the network.

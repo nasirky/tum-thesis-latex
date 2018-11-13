@@ -2,7 +2,7 @@
 % Add the above to each chapter to make compiling the PDF easier in some editors.
 
 \chapter{Design and Implementation}\label{chapter:design_and_implementation}
-This chapters explains the design and implementation details. All of the sections in this chapter are divided into Concepts, Implementation and Configuration subsections.
+This chapters explains the design and implementation details. The chapter starts with how to prepare maps for simulations. It then explains the concept and implementation of access points and snapping to access points.
 \section{Maps}
 This section explains how maps are used, and how to prepare and configure maps for ONE simulator.
 	\subsection{Concept}
@@ -66,13 +66,12 @@ This section explains how maps are used, and how to prepare and configure maps f
 	\vspace{6mm}
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.5]{./figures/central-munich-wkt}
+		\includegraphics[scale=0.45]{./figures/central-munich-wkt}
 		\caption{Central Munich WKT Map - Created using OSM2WKT tool \cite{mayer2010osm} and Screenshot using OpenJump \cite{openjump}}
 		\label{fig:central-munich-wkt}
 	\end{figure}
 	\vspace{3mm}
 We use the above map (Figure~\ref{fig:central-munich-wkt}) in our simulations. This map works fine with ONE simulator as it is a fully connected map and it has also been converted to the points-based system used by ONE simulator.
-\newpage
 \subsection{Implementation}
 This section list and explains all the steps needed to configure and run a new map (downloaded from OpenStreetMap \cite{openstreetmap}) in ONE simulator.
 \subsubsection{OSM to WKT}
@@ -166,33 +165,30 @@ In this section, we will introduce the concept of access points and how they are
 Access Points are devices that connect devices to one another and facilities the flow of information among devices. One of an interesting use case would be to connect the nodes to the internet using these access points. An Access Point can operate in any of the following three modes:
 
 	\begin{center}
-    	\captionof{table}{ONE Simulator: Modes of Operation for Access Points/Wifi Interface}
 	    \begin{tabular}{ | l | p{10.5cm} |}
     		\hline
     		\textbf{Mode} & \textbf{Description} \\ \hline
     		\textit{Access Point (AP)} & Access Point (AP) provides a bridge for two Station Adapters (SAs) to connect and communicate with each other. Two Access Points cannot talk to each other directly. \\ \hline
     		\textit{Station Adapter (SA)} & Station Adapter (SA) is a passive device that can connect to an Access Point and communicate to other Station Adapters using the Access Point (AP). Two Station Adapters cannot talk to each other directly. \\ \hline
     		\textit{Ad-hoc} & Ad-hoc Mode is used when we want two devices to connect and communicate directly to each other. Hosts in Ad-hoc mode cannot connect to either an Access Point (AP) or Station Adapter(SA) and vice versa. This is the default mode.\\ \hline
-    	\end{tabular}
+				\textit{Normal Hosts} & Normals hosts are the ones with no access point features. In other words, Normal Hosts behave and perform similar to the \textit{Ad-hoc} hosts.\\ \hline
+			\end{tabular}
+			\captionof{table}{ONE Simulator: Modes of Operation for Access Points/Wifi Interface}
 	\end{center}
 	\vspace{5mm}
 	Figure~\ref{fig:aps1} shows the color scheme used by ONE simulator to differentiate between nodes with different modes of operation. It also differentiates between normal and access point enabled hosts.\newline
 	\begin{figure}[h]
 		\centering
-		\includegraphics[scale=0.45]{./figures/aps-1}
+		\includegraphics[scale=0.4]{./figures/aps-1}
 		\caption{Hosts with Access Points (SA, AP, and Ad-hoc) and Normal Host}
 		\label{fig:aps1}
 	\end{figure}
-	\newpage
-	Below is a screenshot from the ONE Simulator with all of the above hosts in action.\newline
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.5]{./figures/aps-2}
+		\includegraphics[scale=0.42]{./figures/aps-2}
 		\caption{ONE Simulator showing all the Hosts (AP enabled and normal) in action}
 	\end{figure}
-	The above figure shows that station adapters can connect to an access point (\textit{SA5} and \textit{AP3}), ad-hoc nodes can connect to other ad-hoc nodes (\textit{AD10} and \textit{AD11}), ad-hoc nodes cannot connect to access points and vice versa (\textit{AD10}), \textit{AD11} and \textit{SA6}). It also shows that the normal hosts cannot connect to access points enabled hosts (\textit{Normal15} and \textit{SA8}, \textit{Normal16} and \textit{AD12} etc.).
-
-\newpage
+The above figures shows all of the hosts type in action in the ONE Simulator. It shows that station adapters can connect to an access point (\textit{SA5} and \textit{AP3}), ad-hoc nodes can connect to other ad-hoc nodes (\textit{AD10} and \textit{AD11}), ad-hoc nodes cannot connect to access points and vice versa (\textit{AD10}), \textit{AD11} and \textit{SA6}). It also shows that the normal hosts cannot connect to access points enabled hosts (\textit{Normal15} and \textit{SA8}, \textit{Normal16} and \textit{AD12} etc.).\newline
 \subsection{Implementation}
 Before discussing implementation details, We would like to discuss the pre-requisite for the implementation. The following table lists two classes and what they are used for:
 	\begin{center}
@@ -345,7 +341,7 @@ Now, we need to combine both of these to make sure that any host having a \texti
 The above listing performs a few operations, which are divided into the following three groups:
 \begin{enumerate}
 	\item In this section, we iterate through all the interfaces looking for a wifi interface (to determine if the host has access point support).
-	\item In this section, we read the mode variable or the modeFile and store all of the modes.
+	\item In this section, we read the mode for all the hosts. As mentioned earlier, we have two ways of providing mode. The first one is to provide a mode file (containing mosts for all the hosts) and the second way is to to mention a mode for all the hosts of that node. The modes are read from the mode file (if it exists) otherwise it is read from the mode parameter (which is then applicable to all the nodes of the group).
 	\item This is the section where we differentiate between normal and access points enabled hosts. This section first checks what type of host to create and in case of an access point enabled host, it sets the mode by fetching it from either the \textit{wifiMode} variable or the \textit{modes} array.
 \end{enumerate}
 \subsection{Configuration}
@@ -360,6 +356,7 @@ wifiInterface.transmitRange = 40
 btInterface.type = SimpleBroadcastInterface
 btInterface.transmitSpeed = 250k
 btInterface.transmitRange = 10
+
 
 //2.
 Scenario.nrofHostGroups = 5
@@ -393,11 +390,24 @@ Below is a summary of the above listing:
 	\item We define two interfaces with transmission range and speed. One of the interfaces is a \textit{WifiInterface}.
 	\item We are defining the general settings for the simulation and all the groups. We are setting the total number of groups to 5, the number of interfaces for each group to 1 and setting \textit{btInterface} as the default group of each group.
 	\item We are setting the ID for Group1 which is using the default interface.
-	\item We are defining three groups to use \textit{wifiInterface}. We are also setting the mode for each group (all the hosts of that group share the same mode)/
-	\item We are defining one more group to use \textit{wifiInterface}. However, here we are setting the modes using a text file.
+	\item We are defining three groups to use \textit{wifiInterface}. We are also setting the mode for each group (all the hosts of that group share the same mode)
+	\item We are defining one more group to use \textit{wifiInterface}. However, here we are setting the modes using a text file. A typical mode contains one mode per line.
 \end{enumerate}
+\newpage
+\begin{lstlisting}[language=bash]
+ap
+sa
+ap
+sa
+sa
+sa
+\end{lstlisting}
+\captionof{lstlisting}{Contents of mode file}
+\vspace{3mm}
+The above listing shows the contents of the mode file. The mode for first and third host is set to access point (ap) while the mode for second, fourth, fifth and sixth host is set to station adapter (sa). The modes are assigned in a circular way. In the above case, the seventh host will have the mode access point (ap) and the eigthth one will be station adapter(sa).
+
 \section{Snapping to Access Points}
-In this section, we define a new concept known as snapping to access points.
+In this section, we define a new concept "snapping to access points".
 \subsection{Concept}
 Section~\ref{section:floating-content} discusses that a message is tagged with geographical coordinates and an availability/radius. \textit{Snapping to Access Point} is the concept of increasing the availability of the message beyond its original availability zone. In the configuration, we can define how many Access Points should the message snap to at maximum. Theoretically, the number of snapped Access Points should directly influence the TTL (Time to live) of the message. Below is a step-wise explanation of the process:
 
@@ -421,28 +431,28 @@ Section~\ref{section:floating-content} discusses that a message is tagged with g
  	 \end{enumerate}
 	\begin{figure}[h]
 		\centering
-		\includegraphics[scale=0.35]{./figures/snapped-to-ap-1}
+		\includegraphics[scale=0.3]{./figures/snapped-to-ap-1}
 		\caption{Availability zones of Message with k=0 (not snapped yet) to the left and k=1 (snapped to 1 Access Point) to the right}
 	\end{figure}
 	\vspace{1mm}
 	\begin{figure}[h]
 		\centering
-		\includegraphics[scale=0.35]{./figures/snapped-to-ap-2}
+		\includegraphics[scale=0.3]{./figures/snapped-to-ap-2}
 		\caption{Availability zones of Message with k=2 (snapped to 2 Access Points)}
 	\end{figure}
 	\vspace{1mm}
 	\begin{figure}[h!]
 		\centering
-		\includegraphics[scale=0.35]{./figures/snapped-to-ap-3}
+		\includegraphics[scale=0.3]{./figures/snapped-to-ap-3}
 		\caption{Availability zones of Message with k=3 (snapped to 3 Access Points)}
 	\end{figure}
 	\begin{figure}[h!]
 		\centering
-		\includegraphics[scale=0.35]{./figures/snapped-to-ap-4}
+		\includegraphics[scale=0.3]{./figures/snapped-to-ap-4}
 		\caption{Special Case: Message with k=3 where there is no overlap between availability zones of the copies}
 	\end{figure}
+In the above figure, the solid circle shows the original anchor zone while the dotted ones show the added anchor zones (due to snapping to access points).
 
-\newpage
 \subsection{Implementation}
 We will explain the implementation of this feature step by step below:
 \begin{itemize}
@@ -526,13 +536,12 @@ for (Message m : m_set) {
 \begin{lstlisting}[language=bash]
 FloatingContentRouter.kNextAPs = 1
 \end{lstlisting}
-In the above listing, we are setting the number of access points a message can snap to 1. It means that each message can snap to 1 access points at maximum.
-\newpage
+In the above listing, we are setting the number of access points a message can snap to 1. It means that each message can snap to 1 access points at maximum.\newline
+\vspace{4mm}
 \section{Access Points Data}
-\subsection{Concept}
-\subsubsection{Data Collection}
+\subsection{Data Collection}
 We are using the access points database from RadioCells \cite{wifi-data}. The database has a number of tables, however, we are only concerned with \textit{wifi\_zone}. We are only using \textit{latitude} and \textit{longitude} data.
-\subsubsection{Data Processing}
+\subsection{Data Processing}
 We follow the following steps to process the data for the ONE Simulator:
 \begin{enumerate}
 	\item The data from access points database (which is a SQLite database) \cite{wifi-data} is exported to a text file.
@@ -582,7 +591,7 @@ To read the WKT file in ONE simulator, we have implemented \textit{StationaryMap
     	\captionof{table}{ONE Simulator: Classes for WKT based Node positioning} \label{tab:wktMapFiles}
 
 	\end{center}
-\newpage
+\vspace{4mm}
 Below code snippet shows the main functionality from \textit{StationaryMapBasedMovement}.
 \vspace{3mm}
 \begin{lstlisting}[language=java]
@@ -592,6 +601,7 @@ Below code snippet shows the main functionality from \textit{StationaryMapBasedM
 		String fileName = settings.getSetting(ROUTE_FILE_S);
 		allNodes = MapNodeExtended.readNodes(fileName, getMap());
 	}
+
 	@Override
 	public Coord getInitialLocation() {
 		counter = (counter + 1) % allNodes.size();
@@ -601,8 +611,7 @@ Below code snippet shows the main functionality from \textit{StationaryMapBasedM
 \end{lstlisting}
 \label{lstlisting:node-positioning}
 \captionof{lstlisting}{Main features of \textit{StationaryMapBasedMovement} class}
-
-\vspace{10mm}
+\newpage
 Below is the main code snippet from \textit{MapNodeExtended} class.
 \vspace{3mm}
 \begin{lstlisting}[language=java]
@@ -654,4 +663,20 @@ The following listing explains the main features of the above code:
 Group1.movementModel = StationaryMapBasedMovement
 Group1.routeFile = data/path_to_wkt_file/file_name.wkt
 \end{lstlisting}
-The above listing shows how we can configure ONE simulator to use a WKT map file (containing access points). First, we need to  set the \textit{movementModel} of the group to \textit{StationaryMapBasedMovement}. Then, we specify the relative path to the map file using \textit{routeFile}.
+The above listing shows how we can configure ONE simulator to use a WKT map file (containing access points). First, we need to  set the \textit{movementModel} of the group to \textit{StationaryMapBasedMovement}. Then, we specify the relative path to the map file using \textit{routeFile}. The \textit{routeFile} contains a list of points corresponding to locations of the coordinate. The ONE simulator reads the file and then generate a host for each of the location entry in the route file. It provides us with a lot of convenience when we are dealing with a large number of access points. Below is an example of the \textit{routeFile}.\newline
+\begin{lstlisting}[language=bash]
+POINT (639.05096629 151.42031916)
+POINT (1124.6343505 156.31790994)
+POINT (1229.05174141 160.25170123)
+POINT (291.6431266 165.00433641)
+POINT (330.2305165 169.25611572)
+POINT (385.48305451 171.98452587)
+POINT (329.33378635 175.55010239)
+POINT (1063.92493432 178.36989042)
+POINT (285.92316817 181.90934024)
+POINT (381.15773888 185.35371429)
+POINT (600.20507564 188.42838956)
+POINT (1232.16833224 191.79426032)
+POINT (350.99008131 194.8568775)
+\end{lstlisting}
+\captionof{lstlisting}{Conents of routeFile}

@@ -65,10 +65,10 @@ As users with mobile devices pass through locations, they automatically receive 
 
 
 \subsubsection{Floating Content \cite{floating-content}}
-Floating content is an ephemeral content sharing service, solely dependent on mobile devices in the vicinity using principles of opportunistic networking. The net result is a best effort service for floating content in which: 1) information dissemination is geographically limited; 2) the lifetime and spreading of information depend on interested nodes being available; 3) traffic can only be created and caused locally; and 4) content can only be added, but not deleted. Floating Content is discussed in more details \hyperref[section:floating-content]{\emph{later in the chapter}}.
+Floating content is an ephemeral content sharing service, solely dependent on mobile devices in the vicinity using principles of opportunistic networking. Floating content has some intrinsic properties which are: 1) information dissemination is geographically limited; 2) the lifetime and spreading of information depend on interested nodes being available; 3) traffic can only be created and caused locally; and 4) content can only be added, but not deleted. Floating Content is discussed in more details \hyperref[section:floating-content]{\emph{later in the chapter}}.
 
 \subsection{Delay Tolerant Networking (DTN)}
-Delay-tolerant Networking (DTN) enables communication in sparse mobile ad-hoc networks and other challenged environments where traditional networking fails and new routing and application protocols are required. Past experience with DTN routing and application protocols has shown that their performance is highly dependent on the underlying mobility and node characteristics \cite{keranen-theone}. The basic idea behind DTN is to communicate data/messages from the source to the destination without having complete network connectivity. The path from the source to the destination is unknown due to the unconnected nature of the network. In such networks, each node store the messages it receives and forwards it to the next node it comes in contact with. The message may or may not reach its final destination.\newline
+Delay-tolerant Networking (DTN) \cite{fall-2003} enables communication in sparse mobile ad-hoc networks and other challenged environments where traditional networking fails and new routing and application protocols are required. Past experience with DTN routing and application protocols has shown that their performance is highly dependent on the underlying mobility and node characteristics \cite{keranen-theone}. The basic idea behind DTN is to communicate data/messages from the source to the destination without having complete network connectivity. The path from the source to the destination is unknown due to the unconnected nature of the network. In such networks, each node store the messages it receives and forwards it to the next node it comes in contact with. The message may or may not reach its final destination.\newline
 DTNs are also known \textit{Opportunistic Networks} due to the fact that the nodes connect to each other and transfer message as soon as they get the opportunity (when they come in vicinity of each). Below are a few characteristics of DTNs:
 \begin{enumerate}
   \item \textbf{Mobility}: DTN is based on the concept of mobile nodes which enables the flow of information. Unlike traditional networks, node mobility to required to transfer data.
@@ -78,7 +78,6 @@ DTNs are also known \textit{Opportunistic Networks} due to the fact that the nod
 
 \newpage
 \section{The ONE Simulator}
-\subsection{Introduction}
 The ONE is an Opportunistic Network Environment simulator \cite{the-one} which provides a powerful tool for generating mobility traces, running DTN messaging simulations with different routing protocols, and visualizing both simulations interactively in real-time and results after their completion \cite{the-one-ari}.
 
 The ONE simulator was originally developed in Aalto University in the SINDTN \cite{sindtn} and CATDTN projects supported by Nokia Research Center (Finland). It is now maintained in by Aalto Univerity in cooperation with the Technical University of Munich.\newline
@@ -108,9 +107,6 @@ Figure ~\ref{fig:onesimulatorenvironment} illustrates the different components o
 \label{fig:onesimulatorenvironment}
 \end{figure}
 
-\subsection{Compilation}
-ONE can be compiled from the source code using both Command Line and Eclipse. However, we will discuss only the command line. The ONE source contains \textit{compile.sh} and \textit{compile.bat} for compilation on the Linux/Unix and Windows Platform respectively.
-\newline
 \subsection{Running}
 Just like Compilation, ONE can be run from both Command Line and Eclipse. However, we will discuss only the command line.
 
@@ -133,8 +129,7 @@ Namespace.key = value
 
 Both \textit{Namespace} and \textit{key} follow the camelCase and are case sensitive. \textit{value} can be numeric, boolean, strings, comma-separated values, value filling and reference to other files. Numeric values can also use the suffixes \textit{k} for Kilo, \textit{M} for Mega and \textit{G} for Giga.
 
-\subsection{Components}
-\subsubsection{Host Group}
+\subsection{Host Group}
 Host Groups represents a collection of hosts with the same configuration such as Movement Model etc. In other words, similar nodes are grouped in a Host Group. Theoretically, each host group must have a different configuration from the other host groups. All the host groups can also share configuration (such as the number of hosts etc.) which are defined under \textit{Group} namespace. However, configuration inside the specific host group takes precedence over the global \textit{Group} namespace.
 \begin{lstlisting}[language=bash]
 Group.nrofHosts = 20
@@ -147,7 +142,7 @@ Group3.groupID = G3
 
 In the above listing, \textit{Group} defines the number of hosts (i.e. 20) for all the groups. However, \textit{Group1} overrides this property and sets the number of hosts to 30. So, now we have three groups where \textit{Group1} has 30 hosts while \textit{Group2} and \textit{Group3} have 20 hosts each.
 
-\subsubsection{Movement Models}
+\subsection{Movement Models}
 Movement Models dictate the node movements in the simulation. A number of Movement Models come packaged with the ONE simulator such as \textit{Map based Movement}, \textit{Shortest Path Map based Movement}, \textit{Random Waypoint}, \textit{External Movement} and \textit{Stationary Movement}. \textit{Map based Movement} has further types of movements such as \textit{Car Movement} and \textit{Map Route Movement} etc.
 \begin{lstlisting}[language=bash]
 Group.movementModel = MapbasedMovement
@@ -156,7 +151,7 @@ Group1.movementModel = RadomWaypoint
 
 In the above listing, we are setting the movement type for all the groups to \textit{MapbasedMovement}, however, \textit{Group1} is overriding and setting it to \textit{RandomWaypoint}.
 
-\subsubsection{Routing}
+\subsection{Routing}
 Routing Module is responsible for handling the transfer (routing) of messages between hosts. ONE simulator one passive and a number of active routers. A passive router is used for interacting with other DTNs or dummy nodes. The active routers implement the well-known routing algorithms for DTN such as \textit{Epidemic}, \textit{Spray and Wait}, \textit{First Contact}, \textit{Direct Delivery}, \textit{Prophet}, \textit{Prophet V2}, \textit{Life}, \textit{Wave}, \textit{MaxProp} and \textit{Floating Content}.
 \begin{lstlisting}[language=bash]
 Group.router = EpidemicRouter
@@ -166,7 +161,7 @@ Group2.router = DirectDeliveryRouter
 In the above listing, \textit{EpidemicRouter} is used for all the groups except \textit{Group2} which is using the \textit{DirectDeliveryRouter}.
 
 
-\subsubsection{Value Filling}
+\subsection{Value Filling}
 Value Filling is used to dynamically fill the value during run-time. The main purpose is to use the value of a variable during run-time. To use value-filling, we put the key name as value surrounded by %% such as %%keyName%%. Below is an example:
 \begin{lstlisting}[language=bash]
 MovementModel.warmup = %%Reports.warmup%%
@@ -174,7 +169,7 @@ MovementModel.warmup = %%Reports.warmup%%
 
 In the above listing, we are setting up the warmup for \textit{MovementModel} to be the same as the warmup used for \textit{Reports}.
 
-\subsubsection{Run Indexing}
+\subsection{Run Indexing}
 There are times when we want to run a number of simulations for different permutations of the configuration such as varying number of hosts, varying size of the message etc. One solution would be to create different configurations and write a script passing the desired configuration for each run. However, it is not a maintainable solution if we have a different number of permutations (changing 3 values each for two different parameters). The ONE (Opportunistic Network Environment) simulator solves this problem by using run indexing. Run indexing allows us to change configuration during run-time by providing the same configuration file;  containing a set of semi-colon separated values surrounded by braces ([]) for the desired key(s).
 
 \begin{lstlisting}[language=bash]
@@ -206,10 +201,10 @@ Assuming we have 2 nodes (\textit{A} and \textit{B}). For the sake of simplicity
 \begin{figure}[h]
 \centering
 \includegraphics{./figures/anchor-zone}
-\caption{Floating-Content and its anchor zone \cite{floating-content}}
+\caption{Floating-Content and its anchor zone \cite{floating-content-1}}
 \label{fig:floating-content}
 \end{figure}
-Figure ~\ref{fig:floating-content} shows the availability zone (\textit{a}) of the item, which is the outer circle. It also shows the replication zone (\textit{r}) of the item, which is the inner circle. Inside the inner circle (which represents \textit{r}), the item (depicted by a red dot) is copied to other nodes. Outside the inner circle and inside the outer circle (which represents \textit{a}), the item still exists but is not replicated. However, the item does not exist outside the anchor zone \textit{a}.
+Figure ~\ref{fig:floating-content} shows two circles, where the outer circle represents the availability zone (\textit{a}) and the inner circle represents the replication zone (\textit{r}) of the item, which is the inner circle.
 
 \subsection{Important Concepts}
 The following list summarizes the important concepts:
