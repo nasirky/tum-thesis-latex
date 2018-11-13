@@ -2,7 +2,7 @@
 % Add the above to each chapter to make compiling the PDF easier in some editors.
 
 \chapter{Conclusions}\label{chapter:conclusions}
-In this chapter, we will discuss what we have infered from the simulations and their results. This will enable us to understand and summarize the behavior of access points as well as snapping to access point in ONE simulator. We will list the research questions below and then answer them as per the outcome of the simulation).\newline
+In this chapter, we will discuss what we have inferred from the simulations' results. This will enable us to understand and summarize the behavior of access points as well as snapping to access point in ONE simulator. We will list the research questions below and then answer them as per the outcome of the simulation).\newline
 
 \textbf{Q1: Modeling a city and exploring the impact of access points on the performance of geo-based information sharing.} \newline
 
@@ -21,8 +21,8 @@ Access points have an overall positive effect on the network. Below is a break-d
   \item Increasing \textbf{k} always has a positive effect regardless of the availability zone size. The average message life is always better for higher values of \textbf{k} than lower values.
   \item Increasing \textbf{k} always has a positive effect regardless of the number of hosts. The average message life is always better for higher values of \textbf{k} when compared to lower values.
 \end{enumerate}
-A number of extensions can be investigated for improving the performance of the network (measured in fraction of TTL). The following paragraph explains some of those improvements:\newline
-Access Point based networks are quite common and pratical (compared to Ad-hoc networks). Such DTNs (with floating content generation and routing capabilities) can now be implemented and evaluated in real world scenarios. There are a lot of practical use-cases for such networks. One major use-case would be to connect the DTNs to the internet (using these access points). Other use-cases include improving relief efforts in remote areas and implementing location-based secure messaging/information platforms etc. \newline
-The current behavior is that in case a host has a copy of the message, it will not accept new copy of the message. The disadvantage is that both the hosts might not have the updated information for the snapped access points. A feature would be to replicate this information (information about the access points the message is snapped to) between hosts even when a copy of the same message exists on that host.\newline
+A number of extensions can be investigated for improving the performance of the network (measured in fraction of the TTL). The following paragraph explains some of those improvements:\newline
+Access Point based networks are quite common and practical (compared to Ad-hoc networks). Such DTNs (with floating content generation and routing capabilities) can now be implemented and evaluated in real-world scenarios. There are a lot of practical use-cases for such networks. One major use-case would be to connect the DTNs to the internet (using these access points). Other use-cases include improving relief efforts in remote areas and implementing location-based secure messaging/information platforms etc. \newline
+The current behavior is that in case a host has a copy of the message, it will not accept a new copy of the message. The disadvantage is that both the hosts might not have the updated information for the snapped access points. A feature would be to replicate this information (information about the access points the message is snapped to) between hosts even when a copy of the same message exists on that host.\newline
 Another feature would be to have specific nodes (preferably access points) responsible for holding the access points snapping information of all messages. These nodes will read such information from all the hosts and will send them this information for the message it holds.\newline
-Theoretically, the above extensions would improve performance of the system. However, it might not be the case practically.
+Theoretically, the above extensions would improve the performance of the system. However, it might not be the case practically.
