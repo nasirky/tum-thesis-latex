@@ -1,6 +1,6 @@
 /build/*
 !/build/main.pdf
-/logos/*.pdf
+#/logos/*.pdf
 main.aux
 main.bcf
 main.dvi
